@@ -22,7 +22,7 @@ $(function() {
         timerHandler = null,
         
         /* Update interval (in milliseconds). Interval for checking change data loop */
-        updateStatusInterval = 5 * 1000,
+        updateStatusInterval = 2 * 1000,
         
         /* Debug mode (true|false). Enable console.log output */
         DebugMode = false,
