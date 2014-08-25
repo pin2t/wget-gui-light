@@ -4,7 +4,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.3
+## @version   0.0.5
 
 ## 3rd party used tools:
 ##   * notifIt! <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
@@ -22,7 +22,7 @@ $(function() {
         timerHandler = null,
         
         /* Update interval (in milliseconds). Interval for checking change data loop */
-        updateStatusInterval = 2 * 1000,
+        updateStatusInterval = 3 * 1000,
         
         /* Debug mode (true|false). Enable console.log output */
         DebugMode = false,
@@ -110,8 +110,9 @@ $(function() {
             if((ID >= 0) || (URL.length >= 11))
                 $.getJSON(prc, {'action': 'remove_task', 'url': URL, 'id': ID})
                     .done(function(answerJSON) {
+                        if(DebugMode) console.log(answerJSON);
                         var result = (answerJSON.status == '1') ? true : false;
-                        if ($.isFunction(callback)) callback(result);
+                        if ($.isFunction(callback)) callback(result, answerJSON.msg);
                         return result;
                     })
                     .fail(function(answerJSON) {
@@ -126,6 +127,21 @@ $(function() {
                 }
         });
         return false;
+    }
+    
+    function testServer() {
+        $.getJSON(prc, {'action': 'test'})
+            .done(function(answerJSON) {
+                if(DebugMode) console.log(answerJSON);
+                var msgType = (answerJSON.status == '1') ? "success" : "error";
+                notif({type: msgType, multiline: true, autohide: false, position: "center", msg: answerJSON.msg});
+                return true;
+            })
+            .fail(function(answerJSON) {
+                if(DebugMode) console.log(answerJSON);
+                notif({type: "error", position: "center", msg: 'Server test &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                return false;
+            });
     }
     
     /* *** TASKS data **************************************************************** */
@@ -150,6 +166,10 @@ $(function() {
             return false;
         }
         
+        if(fileUrl === 'test') {
+            testServer(); return false;
+        }
+        
         /* http://stackoverflow.com/a/8317014 */
         if(!/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(fileUrl)) {
             notif({type: "warning", position: "center", msg: "Address not valid"});
@@ -169,12 +189,12 @@ $(function() {
     }
     
     function removeTask(taskID) {
-        removeWgetTask(taskID, function(bool_result){
+        removeWgetTask(taskID, function(bool_result, msg){
             if(bool_result) {
                 removeTaskGui(taskID);
                 syncTasksList();
             } else {
-                notif({type: "error", position: "center", msg: 'Download task ('+taskID+') not removed'});
+                notif({type: "error", multiline: true, position: "center", msg: '<strong>Download task not removed</strong><br />(ID'+taskID+', "'+msg+'")'});
             }
         });
     }

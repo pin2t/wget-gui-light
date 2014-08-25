@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.3
+## @version   0.0.5
 ##
 ## @depends   *nix, php5, wget, bash, ps, kill, rm
 
@@ -25,7 +25,6 @@ define('download_path', BASEPATH.'/downloads');
 ##   Path to temp files directory. Temp files will created by 'wget' for 
 ##   getting progress in background job, and will be deleted automatically
 ##   on finish or cancel task (thx to <https://github.com/ghospich>).
-##   Comment this line for disable this feature
 define('tmp_path', '/tmp');
 
 ## Path to 'wget' (check in console '> which wget'). UNcomment and set if
@@ -58,10 +57,13 @@ define('wget_secret_flag', '--max-redirect=4321');
 
 header('Content-Type: application/json; charset=UTF-8'); // Default header
 
+if(!defined('tmp_path')) define('tmp_path', '/tmp');
 if(!defined('wget')) define('wget', 'wget');
 if(!defined('ps'))   define('ps', 'ps');
 if(!defined('kill')) define('kill', 'kill');
-if(!defined('rm')) define('rm', 'rm');
+if(!defined('rm'))   define('rm', 'rm');
+
+//error_reporting(-1); ini_set('display_errors', 'On');
 
 // Prepare url before downloading
 function prepareUrl($url) {
@@ -91,6 +93,12 @@ function bash($cmd, $result_type) {
     return $result;
 }
 
+// Check PID value
+function validatePid($pid) {
+    // 32768 is maximum pid by default
+    return (is_numeric($pid) && ($pid > 0) && ($pid <= 32768)) ? true : false;
+}
+
 // Get PID value by any string in task
 function getWgetTasksList($string) {
     $result = array();
@@ -101,13 +109,8 @@ function getWgetTasksList($string) {
         // make FAST search:
         // find string with 'wget' and without '2>&1'
         if((strpos($task, 'wget') == true) && (strpos($task, '2>&1') == false) && (strpos($task, $string) == true)) {
-            if(defined('tmp_path')) {
-                preg_match("/(\d{1,5}).*wget.*--output-file=(\/.*\d{3,6}\.log\.tmp).*".wget_secret_flag."\s(.*)/i", $task, $founded);
-                $pid = $founded[1]; $logfile = $founded[2]; $url = $founded[3];
-            } else {
-                preg_match("/(\d{1,5}).*wget.*".wget_secret_flag."\s(.*)/i", $task, $founded);
-                $pid = $founded[1]; $url = $founded[2];
-            }
+            preg_match("/(\d{1,5}).*wget.*--output-file=(\/.*\d{3,6}\.log\.tmp).*".wget_secret_flag."\s(.*)/i", $task, $founded);
+            $pid = $founded[1]; $logfile = $founded[2]; $url = $founded[3];
             array_push($result, array(
                 'debug'    => (string) $founded[0],
                 'pid'      => (int) $pid,
@@ -116,33 +119,51 @@ function getWgetTasksList($string) {
             ));
         }
     }
+    
+    // If in '$string' passed PID
+    if(validatePid($string)) {
+        foreach($result as $task)
+            if($task['pid'] == $string)
+                return $task;
+        return array();
+    }
+                
     return $result;
-}
-
-// Check PID value
-function validatePid($pid) {
-    // 32768 is maximum pid by default
-    return (is_numeric($pid) && ($pid > 0) && ($pid <= 32768)) ? true : false;
 }
 
 // IMPORTANT FUNCTION
 // Remove download task. Just kill process
 function removeWgetTask($pid) {
     if(!validatePid($pid))
-        return false;
+        return array(
+            'result' => false,
+            'msg' => 'ID is invalid'
+        );
 
     $taskData = getWgetTasksList($pid);
+    //var_dump($taskData);
     
-    $kill = bash(kill.' -15 '.$taskData[0]['pid'], 'string');
+    if(empty($taskData))
+        return array(
+            'result' => false,
+            'msg' => 'Task not exists'
+        );
     
-    if (defined('tmp_path') && !empty($taskData[0]['logfile']) && file_exists($taskData[0]['logfile'])) {
-        $del = bash(rm.' -f '.$taskData[0]['logfile'], 'string');
+    $kill = bash(kill.' -15 '.$taskData['pid'], 'string');
+    if (!empty($taskData['logfile']) && file_exists($taskData['logfile'])) {
+        $del = bash(rm.' -f '.$taskData['logfile'], 'string');
     }
     
-    if(!is_null($taskData[0]['pid']) && empty($kill) && empty($del))
-        return true;
+    if(!is_null($taskData['pid']) && empty($kill) && empty($del))
+        return array(
+            'result' => true,
+            'msg' => 'Task removed success'
+        );
         
-    return false;
+    return array(
+        'result' => false,
+        'msg' => 'No remove data'
+    );
 }
 //var_dump(removeWgetTask(1276)); // Debug call
 
@@ -150,11 +171,8 @@ function removeWgetTask($pid) {
 // IMPORTANT FUNCTION
 // Add task for a work
 function addWgetTask($url) {
-    $speedLimit = (defined('wget_download_limit')) ? ' --limit-rate='.wget_download_limit.'k ' : '';
-    $tmpFileName = (defined('tmp_path')) ? tmp_path.'/wget'.rand(1, 32768).'.log.tmp' : '';
-    
-    $tmpFileFlag = (defined('tmp_path')) ? ' --output-file="'.$tmpFileName.'" ' : '';
-    $tmpFileRm   = (defined('tmp_path')) ? ' && '.rm.' -f "'.$tmpFileName.'"' : '';
+    $speedLimit = (defined('wget_download_limit')) ? '--limit-rate='.wget_download_limit.'k ' : ' ';
+    $tmpFileName = tmp_path.'/wget'.rand(1, 32768).'.log.tmp';
     
     $cmd = '('.wget.' '.
         '--progress=bar:force '.
@@ -163,25 +181,51 @@ function addWgetTask($url) {
         '--user-agent="Mozilla/5.0 (X11; Linux amd64; rv:21.0) Gecko/20100101 Firefox/21.0" '.
         '--directory-prefix="'.download_path.'" '.
         $speedLimit.
-        $tmpFileFlag.
+        ' --output-file="'.$tmpFileName.'" '.
         wget_secret_flag.' '.
-        prepareUrl($url).$tmpFileRm.') > /dev/null 2>&1 & echo $!';
+        prepareUrl($url).' && '.rm.' -f "'.$tmpFileName.'") > /dev/null 2>&1 & echo $!';
     
     $task = bash($cmd, 'string');
+    if(empty($task))
+        return array(
+            'result' => false,
+            'msg' => 'Exec task error'
+        );
     
     preg_match("/(\d{1,5})/i", $task, $founded);
-    $pid = $founded[1];
+    $parentPid = $founded[1];
+    if(!validatePid($parentPid))
+        return array(
+            'result' => false,
+            'msg' => 'Parent PID not valid'
+        );
 
-    // var_dump($cmd); var_dump($task); var_dump($pid); 
-    
-    if(validatePid($pid)) {
-        $taskData = getWgetTasksList($url);
+    //var_dump($cmd); var_dump($task); var_dump($parentPid); 
+
+    // Wait ~5 sec until child pipe not running, check every second
+    for ($i = 1; $i <= 5; $i++) {
+        // Get pipe with out wget task (search by $tmpFileName)
+        $taskData = getWgetTasksList($tmpFileName);
         // Get last job with current URL
-        $taskPid = $taskData[count($taskData)-1]['pid'];
-    } else
-        return -1;
+        $taskPid = $taskData[0]['pid'];
+        
+        if(!validatePid($taskPid)) 
+            sleep(1);
+        else
+            break;
+    }
     
-    return (validatePid($taskPid)) ? $taskPid : -1;
+    if(!validatePid($taskPid))
+        return array(
+            'result' => false,
+            'msg' => 'Task PID not valid'
+        );
+    
+    return array(
+        'result' => true,
+        'pid' => (int) $taskPid,
+        'msg' => 'Task added success'
+    );
 }
 //echo addWgetTask('http://goo.gl/v7Ujhg'); // Debug call
 
@@ -189,9 +233,8 @@ function addWgetTask($url) {
 // Get list of active jobs
 function getWgetTasks() {
     $result = array();
-    print_r($task);
-    foreach(getWgetTasksList() as $task) {
-        
+
+    foreach(getWgetTasksList('') as $task) {
         $preogress = 0; 
         if(validatePid($task['pid']) && is_string($task['url']) && !empty($task['url'])) {
             if (!empty($task['logfile']) && file_exists($task['logfile'])) {
@@ -227,34 +270,57 @@ function getWgetTasks() {
 }
 //print_r(getWgetTasks()); // Debug call
 
-$Ajax = true; // Request by AJAX or POST?
+function echoResult($data, $type) {
+    $type = (empty($type)) ? 'json' : (string) $type;
+    
+    switch ($type) {
+        case 'json':
+            echo(json_encode($data));
+            break;
+        case 'text':
+            var_dump($data);
+            break;
+    }
+    return true;
+}
+
+
 // Result array {status: 0, msg: 'message'}
 //   -1 - script started without errors
 //    0 - error
 //    1 - script finished without errors
 $result = array('status' => -1, 'msg' => 'No input data');
 
-// AJAX send data in GET, html in POST
-if((count($_POST) > 0) and (count($_GET) === 0)) {
-    $Ajax = false;
-    // Move data from $_POST to $_GET
-    $_GET = $_POST;
-    // clear $_POST
-    unset($_POST);
+
+
+// Command line support
+if(isset($argv)) {
+    if(isset($argv[1]) && !empty($argv[1])) {
+        $_GET['action'] = $argv[1];
+        if(isset($argv[2]) && !empty($argv[2]))
+            if(validatePid($argv[2]))
+                $_GET['id'] = $argv[2];
+        else
+            $_GET['url'] = $argv[2];
+    }
 }
 
-//$result['input'] = $_GET; // For debug
+// AJAX send data in GET, html in POST
+if((count($_POST) > 0) and (count($_GET) === 0)) 
+    $_GET = $_POST;
+else 
+    $_POST = $_GET;
 
 if(!empty($_GET['action'])) {
     // Set value from GET array to $formData
     $formData = array(
-        'action' => $_GET['action'],
-        'url' => $_GET['url'],
-        'id' => $_GET['id']
+        'action' => @$_GET['action'],
+        'url'    => @$_GET['url'],
+        'id'     => @$_GET['id']
     );
     // Make some clear
     foreach ($formData as $key => $value) {
-        $formData[$key] = htmlspecialchars(strip_tags($value));
+        $formData[$key] = htmlspecialchars($value);
     }
     
     switch ($formData['action']) {
@@ -271,7 +337,11 @@ if(!empty($_GET['action'])) {
                 ));
             }
             
-            $result['msg']    = 'Active tasks list';
+            if(!empty($result['tasks']))
+                $result['msg'] = 'Active tasks list';
+            else
+                $result['msg'] = 'No active tasks';
+                
             $result['status'] = 1;
             break;
         ## Action - Add Task
@@ -279,29 +349,65 @@ if(!empty($_GET['action'])) {
         case 'add_task':
             $url = $formData['url'];
             
-            $taskPid = addWgetTask($url);
+            $addTaskResult = addWgetTask($url);
             
-            if($taskPid > 0) {
-                $result['msg']    = 'Task added';
-                $result['id']     = (int) $taskPid;
+            if($addTaskResult['result'] === true) {
+                $result['msg']    = $addTaskResult['msg'];
+                $result['id']     = (int) $addTaskResult['pid'];
                 $result['status'] = 1;
             } else {
-                $result['msg']    = 'Error task add';
+                $result['msg']    = $addTaskResult['msg'];
                 $result['status'] = 0;
             }
             break;
         ## Action - Cancel (remove) Task
         ################################
         case 'remove_task':
-            $url = $formData['url'];
             $id = $formData['id'];
             
-            if(removeWgetTask($id)) {
-                $result['msg']    = 'Task removed';
+            $removeResult = removeWgetTask($id);
+            if($removeResult['result'] === true) {
+                $result['msg']    = $removeResult['msg'];
                 $result['status'] = 1;
             } else {
-                $result['msg']    = 'Task remove error';
+                $result['msg']    = $removeResult['msg'];
                 $result['status'] = 0;
+            }
+            break;
+        ## Action - Cancel (remove) Task
+        ################################
+        case 'test':
+            if(function_exists('ini_get') && !ini_get('safe_mode')) {
+                $testVal = (string) 'test'.rand(1024, 32768);
+                $bash = bash('echo "'.$testVal.'"', 'string');
+                if(strpos($bash, $testVal) !== false) {
+                    $bash = bash(wget.' -V', 'array');
+                    if(strpos(strtolower($bash[0]), 'gnu wget') !== false) {
+                        preg_match("/(\d{1,2}\.\d{1,3}\.\d{1,3})/i", $bash[0], $founded);
+                        $wgetVersion = $founded[1];
+                        if(!empty($wgetVersion)) {
+                            $result['msg'] = 'PHP \'safe_mode\' = Off, \'exec()\' enabled, \'wget\' version = \''.$wgetVersion.'\'. All right, cap!';
+                            $result['status'] = 1;
+                            break;
+                        } else {
+                            $result['msg'] = 'Getting \'wget\' version error';
+                            $result['status'] = 0;
+                            break;
+                        }
+                    } else {
+                        $result['msg'] = '\'wget\' not installed (http://www.gnu.org/software/wget/)';
+                        $result['status'] = 0;
+                        break;
+                    }
+                } else {
+                    $result['msg'] = 'Enable \'exec()\' in PHP (http://php.net/manual/en/function.exec.php)';
+                    $result['status'] = 0;
+                    break;
+                }
+            } else {
+                $result['msg'] = 'Disable PHP \'safe_mode\' (http://php.net/manual/en/features.safe-mode.php)';
+                $result['status'] = 0;
+                break;
             }
             break;
             
@@ -312,5 +418,4 @@ if(!empty($_GET['action'])) {
 
 }
 
-
-echo(json_encode($result));
+echoResult($result, 'json');
