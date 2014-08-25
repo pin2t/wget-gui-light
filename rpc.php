@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.6
+## @version   0.0.7
 ##
 ## @depends   *nix, php5, wget, bash, ps, kill, rm
 
@@ -383,35 +383,42 @@ if(!empty($_GET['action'])) {
         ## Action - Cancel (remove) Task
         ################################
         case 'test':
-            if(function_exists('ini_get') && !ini_get('safe_mode')) {
-                $testVal = (string) 'test'.rand(1024, 32768);
-                $bash = bash('echo "'.$testVal.'"', 'string');
-                if(strpos($bash, $testVal) !== false) {
-                    $bash = bash(wget.' -V', 'array');
-                    if(strpos(strtolower($bash[0]), 'gnu wget') !== false) {
-                        preg_match("/(\d{1,2}\.\d{1,3}\.\d{1,3})/i", $bash[0], $founded);
-                        $wgetVersion = $founded[1];
-                        if(!empty($wgetVersion)) {
-                            $result['msg'] = 'PHP \'safe_mode\' = Off, \'exec()\' enabled, \'wget\' version = \''.$wgetVersion.'\'. All right, cap!';
-                            $result['status'] = 1;
-                            break;
+            // Added after comment in issue <http://goo.gl/I8gYoK>
+            if(is_dir(download_path) && is_writable(download_path)) {
+                if(function_exists('ini_get') && !ini_get('safe_mode')) {
+                    $testVal = (string) 'test'.rand(1024, 32768);
+                    $bash = bash('echo "'.$testVal.'"', 'string');
+                    if(strpos($bash, $testVal) !== false) {
+                        $bash = bash(wget.' -V', 'array');
+                        if(strpos(strtolower($bash[0]), 'gnu wget') !== false) {
+                            preg_match("/(\d{1,2}\.\d{1,3}\.\d{1,3})/i", $bash[0], $founded);
+                            $wgetVersion = $founded[1];
+                            if(!empty($wgetVersion)) {
+                                $result['msg'] = 'PHP \'safe_mode\' = Off, \'exec()\' enabled, \'wget\' version = \''.$wgetVersion.'\'. All right, cap!';
+                                $result['status'] = 1;
+                                break;
+                            } else {
+                                $result['msg'] = 'Getting \'wget\' version error';
+                                $result['status'] = 0;
+                                break;
+                            }
                         } else {
-                            $result['msg'] = 'Getting \'wget\' version error';
+                            $result['msg'] = '\'wget\' not installed (http://www.gnu.org/software/wget/)';
                             $result['status'] = 0;
                             break;
                         }
                     } else {
-                        $result['msg'] = '\'wget\' not installed (http://www.gnu.org/software/wget/)';
+                        $result['msg'] = 'Enable \'exec()\' in PHP (http://php.net/manual/en/function.exec.php)';
                         $result['status'] = 0;
                         break;
                     }
                 } else {
-                    $result['msg'] = 'Enable \'exec()\' in PHP (http://php.net/manual/en/function.exec.php)';
+                    $result['msg'] = 'Disable PHP \'safe_mode\' (http://php.net/manual/en/features.safe-mode.php)';
                     $result['status'] = 0;
                     break;
                 }
             } else {
-                $result['msg'] = 'Disable PHP \'safe_mode\' (http://php.net/manual/en/features.safe-mode.php)';
+                $result['msg'] = 'Directory, defined in \'download_path\' not exists or not writable';
                 $result['status'] = 0;
                 break;
             }
