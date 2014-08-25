@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.5
+## @version   0.0.6
 ##
 ## @depends   *nix, php5, wget, bash, ps, kill, rm
 
@@ -102,13 +102,19 @@ function validatePid($pid) {
 // Get PID value by any string in task
 function getWgetTasksList($string) {
     $result = array();
-    $tasks = bash(ps.' aux', 'array');
+    // For BSD 'ps axwwo pid,args'
+    // Issue <https://github.com/tarampampam/wget-gui-light/issues/8>
+    // Thx to @ghospich <https://github.com/ghospich>
+    //$tasks = bash(ps.' aux', 'array');
+    $tasks = bash(ps.' -ewwo pid,args', 'array');
     $string = empty($string) ? ' ' : (string) $string;
+    
+    //var_dump($tasks);
     
     foreach($tasks as $task) {
         // make FAST search:
         // find string with 'wget' and without '2>&1'
-        if((strpos($task, 'wget') == true) && (strpos($task, '2>&1') == false) && (strpos($task, $string) == true)) {
+        if((strpos($task, 'wget') !== false) && (strpos($task, '2>&1') == false) && (strpos($task, $string) !== false)) {
             preg_match("/(\d{1,5}).*wget.*--output-file=(\/.*\d{3,6}\.log\.tmp).*".wget_secret_flag."\s(.*)/i", $task, $founded);
             $pid = $founded[1]; $logfile = $founded[2]; $url = $founded[3];
             array_push($result, array(
