@@ -4,7 +4,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.5
+## @version   0.0.8
 
 ## 3rd party used tools:
 ##   * notifIt! <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
@@ -16,8 +16,10 @@
 $(function() {
     var body = $('body').first(),
         root = $('#tasklist'),
-        favicon = $("#favicon"),
-        pageTitle = $(document).find("title"),
+        favicon = $('#favicon'),
+        taskInput = $('#addTaskAddr'),
+        taskButton = $('#addTaskBtn'),
+        pageTitle = $(document).find('title'),
         titleText = pageTitle.text(),
         timerHandler = null,
         
@@ -53,12 +55,13 @@ $(function() {
     /* *** AJAX data ***************************************************************** */
     
     function getWgetTasksList(callback) {
+        if(DebugMode) console.info('getWgetTasksList() called');
         var tasksList = [],
             result = [];
         
         $.getJSON(prc, {'action': 'get_list'})
             .done(function(answerJSON) {
-                if(DebugMode) console.log(answerJSON);
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
                 tasksList = answerJSON.tasks;
                 if($.isArray(tasksList) && tasksList.length > 0) {
                     jQuery.each(tasksList, function() {
@@ -72,7 +75,7 @@ $(function() {
                 }
             })
             .fail(function(answerJSON) {
-                if(DebugMode) console.log(answerJSON);
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
                 notif({type: "error", position: "center", msg: 'Get tasks list &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
                 if ($.isFunction(callback)) callback(result);
                 return result;
@@ -80,43 +83,53 @@ $(function() {
         return result;
     }
     
-    function addWgetTask(url, callback) {
-        var result = false;
-        
-        $.getJSON(prc, {'action': 'add_task', 'url': url})
+    function addWgetTask(inputData, callback) {
+        if(DebugMode) console.info('addWgetTask() called', inputData);
+        $.getJSON(prc, {'action': 'add_task', 'url': inputData.url})
             .done(function(answerJSON) {
-                if ($.isFunction(callback)) callback(answerJSON);
-                return answerJSON;
-            })
-            .fail(function(answerJSON) {
-                if(DebugMode) console.log(answerJSON);
-                notif({type: "error", position: "center", msg: 'Add task &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
+                var result = {
+                    'status':   answerJSON.status,
+                    'msg':      answerJSON.msg,
+                    'id':       answerJSON.id,
+                    // Return some input params for call gui-functions in callback
+                    'url':      inputData.url,
+                    'pregress': inputData.progress,
+                    'isLast':   inputData.isLast
+                };
                 if ($.isFunction(callback)) callback(result);
                 return result;
+            })
+            .fail(function(answerJSON) {
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
+                notif({type: "error", position: "center", msg: 'Add task &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                if ($.isFunction(callback)) callback(false);
+                return false;
             });
     }
     
     function removeWgetTask(url_or_id, callback) {
+        if(DebugMode) console.info('removeWgetTask() called', url_or_id);
         /* check - exists task or not */
         getWgetTasksList(function(tasks){
             var byID = false, byURL = false, ID = -1, URL = '';
             if((typeof url_or_id == 'number') && (url_or_id >= 0)) byID = true;
             if((typeof url_or_id == 'string') && (url_or_id.length >= 11)) byURL = true;
-            jQuery.each(tasks, function() {
-                if(byID  && this.id  == url_or_id) {ID = this.id}
-                if(byURL && this.url == url_or_id) {ID = this.url}
-            });
+            for(var i = 0; i < tasks.length; ++i) {
+                if(byID  && tasks[i].id  == url_or_id) {ID = tasks[i].id}
+                if(byURL && tasks[i].url == url_or_id) {ID = tasks[i].url}
+            }
             
             if((ID >= 0) || (URL.length >= 11))
                 $.getJSON(prc, {'action': 'remove_task', 'url': URL, 'id': ID})
                     .done(function(answerJSON) {
-                        if(DebugMode) console.log(answerJSON);
+                        if(DebugMode) console.log('AJAX result: ', answerJSON);
                         var result = (answerJSON.status == '1') ? true : false;
                         if ($.isFunction(callback)) callback(result, answerJSON.msg);
                         return result;
                     })
                     .fail(function(answerJSON) {
-                        if(DebugMode) console.log(answerJSON);
+                        if(DebugMode) console.log('AJAX result: ', answerJSON);
                         notif({type: "error", position: "center", msg: 'Remove task &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
                         if ($.isFunction(callback)) callback(false);
                         return false;
@@ -130,15 +143,16 @@ $(function() {
     }
     
     function testServer() {
+        if(DebugMode) console.info('testServer() called');
         $.getJSON(prc, {'action': 'test'})
             .done(function(answerJSON) {
-                if(DebugMode) console.log(answerJSON);
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
                 var msgType = (answerJSON.status == '1') ? "success" : "error";
                 notif({type: msgType, multiline: true, autohide: false, position: "center", msg: answerJSON.msg});
                 return true;
             })
             .fail(function(answerJSON) {
-                if(DebugMode) console.log(answerJSON);
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
                 notif({type: "error", position: "center", msg: 'Server test &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
                 return false;
             });
@@ -161,31 +175,57 @@ $(function() {
     
     /* add task function */
     function addTask(fileUrl, progress) {
+        // Make fast check
         if((typeof fileUrl !== 'string') || (fileUrl == '')) {
             notif({type: "warning", position: "center", msg: "Address cannot be empty"});
             return false;
         }
         
+        // Catt 'test' mode
         if(fileUrl === 'test') {
             testServer(); return false;
         }
         
-        /* http://stackoverflow.com/a/8317014 */
-        if(!/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(fileUrl)) {
-            notif({type: "warning", position: "center", msg: "Address not valid"});
-            return false;
+        var urls = fileUrl.split(/\r*\n/),
+            brokenUrls = [], validUrls = [];
+
+        // Make urls check
+        for(var i = 0; i < urls.length; ++i) {
+            var url = urls[i];
+            
+            /* http://stackoverflow.com/a/8317014 */
+            if(/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url)) {
+                validUrls.push(url);
+            } else {
+                brokenUrls.push(url);
+            }
+        }
+
+        // Actions for valid urls
+        for(var i = 0; i < validUrls.length; ++i) {
+            var taskData = {
+                    'url': validUrls[i],
+                    'progress': ((typeof progress !== 'number') || (progress < 0) || (progress > 100)) ? 0 : progress,
+                    'isLast': (validUrls.length-1 === i) ? true : false
+                };
+                
+            // Timer needed for tasks stack (create task order)
+            setTimeout(function(taskData){
+                addWgetTask(taskData, function(result){
+                    if((result !== false) && (result.status == '1')) {
+                        addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id});
+                        if(result.isLast) syncTasksList(); // If it is last task in stack - make sync
+                    } else {
+                        notif({type: "error", multiline: true, position: "center", msg: 'Download "<b>'+result.url+'</b>" not added'});
+                    }
+                });
+            }, 150 * i, taskData/* <--- pass settings object to timer */);
+            
         }
         
-        if((typeof progress !== 'number') || (progress < 0) || (progress > 100)) progress = 0;
-        
-        addWgetTask(fileUrl, function(result){
-            if(result.status == '1') {
-                addTaskGui({'url': fileUrl, 'progress': progress, 'id': result.id});
-                syncTasksList();
-            } else {
-                notif({type: "error", position: "center", msg: 'Download not added'});
-            }
-        });
+        // And for broken
+        if(brokenUrls.length)
+            notif({type: "warning", multiline: true, position: "center", msg: 'Address \"<b>'+brokenUrls.join("</b>, <b>")+'</b>\" is not valid'});
     }
     
     function removeTask(taskID) {
@@ -264,16 +304,18 @@ $(function() {
             if(RemoteTasksIDs.length > 0)
                 pageTitle.text('('+RemoteTasksIDs.length+') '+titleText);
             
-            if(DebugMode) console.log(
-               ' SyncedTasksIDs: '+SyncedTasksIDs+"\n", 
+            if(DebugMode) console.info("Sync data:\n", 
+                'SyncedTasksIDs: '+SyncedTasksIDs+"\n", 
                 'RemoteTasksIDs: '+RemoteTasksIDs+"\n", 
                 'GuiTasksIDs: '+GuiTasksIDs+"\n", 
                 'RemovedTasksIDs: '+RemovedTasksIDs+"\n", 
                 'AddedTasksIDs: '+AddedTasksIDs
             );
             
-            window.clearTimeout(timerHandler);
-            timerHandler = setTimeout(function(){ return syncTasksList() }, updateStatusInterval);
+            if((typeof updateStatusInterval === 'number') && updateStatusInterval > 0) {
+                window.clearTimeout(timerHandler);
+                timerHandler = setTimeout(function(){ return syncTasksList() }, updateStatusInterval);
+            }
         });
     }
     
@@ -369,7 +411,7 @@ $(function() {
         setTaskProgress(taskID, data.progress);
         setMode('active-tasks');
     }
-
+    
     // http://stackoverflow.com/a/20009705
     function changeF5event(e) {
         if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) {
@@ -390,28 +432,61 @@ $(function() {
     
     /* *** EVENTS ******************************************************************** */
     
-    $(document).on("keydown", changeF5event);
+    /* Disable 'not update window on F5' in debug mode */
+    if(!DebugMode)
+        $(document).on('keydown', changeF5event);
     
     /* on press 'enter' in url text input */
-    $('#addTaskAddr').keypress(function(e) {
-        if(e.which == 13) $('#addTaskBtn').click();
+    taskInput.on('keypress', function(e) {
+        taskInput.attr('rows', taskInput.val().split(/\r*\n/).length);
+
+        // [Ctrl] + [Enter] pressed
+        if (e.ctrlKey && (e.keyCode == 10 || e.keyCode == 13)) {
+            taskInput.val(taskInput.val() + "\n");
+            taskInput.trigger('keypress');
+            return false;
+        }
+        // [Enter] pressed
+        if (e.keyCode == 10 || e.keyCode == 13) {
+            taskInput.trigger('keypress');
+            taskButton.click();
+            return false;
+        }
+    }).on('keydown', function(e) {
+        // any event on [Backspace] or [Del] not call 'keypress', and
+        //   we need call it manually after some time
+        if (e.keyCode == 8 || e.keyCode == 46) {
+            setTimeout(function(){ taskInput.trigger('keypress'); }, 10);
+        }
+    }).on('paste', function() {
+        // [Paste] text event
+        setTimeout(function(){ taskInput.trigger('keypress'); }, 10);
     });
     
     /* on press 'add task' button */
-    $('#addTaskBtn').on('click', function(){
-        addTask($('#addTaskAddr').val());
+    taskButton.on('click', function(){
+        addTask(taskInput.val());
     });
     
+    /* #taskExtended functions */
+    taskInput
+        .on('focus', function() {
+            $('#taskExtended .multitask').animate({ opacity: 1 }, 200);
+        })
+        .on('focusout', function() {
+            $('#taskExtended .multitask').animate({ opacity: 0 }, 200);
+        });
     
     // Enable feature 'Quick download bookmark'
     if(($.urlParam('action') == 'add')){
         var url = $.urlParam('url');
-        $('#addTaskAddr').val(url); $('#addTaskBtn').click();
+        taskInput.val(url); taskButton.click();
     }
     $("#bookmark").attr("href", "javascript:window.open('"+document.URL+"?action=add&url='+window.location.toString());void 0;")
     
     /* *** Here we go! :) ************************************************************ */
     
     syncTasksList(); // Run timer
+    taskInput.focus(); // Set focus to input
     
 });

@@ -54,7 +54,29 @@ html,body {
         color: #999;
     }
 
-    #urlbar input[type='text'], #urlbar input[type='url'] {
+    #inputData {
+        display: table;
+        table-layout: fixed;
+        position: relative;
+        left: 16px;
+        width: 100%;
+    }
+        #urlbar div.left, #urlbar div.right {
+            display: table-cell;
+            vertical-align: top;
+        }
+        #urlbar div.left {
+            text-align: left;
+            /*background-color:green;*/
+            
+        }
+        #urlbar div.right {
+            text-align: left;
+            width: 140px;
+            /*background-color:blue;*/
+        }
+    
+    #addTaskAddr {
         border: 1px solid #c1c1c1;
         border-radius: 2px;
         
@@ -63,13 +85,14 @@ html,body {
         
         font-size: 14px;
         font-family: Georgia, Times, 'Times new roman';
-        padding: 6px;
         
-        margin: 0 2px 0 0;
+        position: relative;
+        padding: 6px; left: -12px;
+        resize: vertical; max-height: 200px;
         
-        width: 70%; height: 18px;
+        width: 100%;
     }
-        #urlbar input[type='text']:focus, #urlbar input[type='url']:focus {
+        #addTaskAddr:focus {
             border-color: #4285f4;
         }
 
@@ -84,8 +107,7 @@ html,body {
         font-family: Tahoma, Arial, Verdana;
         font-weight: bold;
         padding: 8px;
-        
-        margin: 0 0 0 2px;
+        margin: 0 0 0 6px;
         
         width: 120px;
     }
@@ -94,6 +116,25 @@ html,body {
             box-shadow: 0px 1px 0px 0px rgba(50, 50, 50, 0.2);
         }
 
+        
+    #taskExtended {
+        padding: 5px 0;
+        color: #777;
+        cursor: default;
+        font-size: 9px;
+    }
+        #taskExtended .b {
+            border: solid #c1c1c1;
+            border-width: 1px 1px 2px 1px;
+            border-radius: 4px;
+            
+            padding: 1px 4px;
+            background-color: #fff;
+            
+            color: #666;
+            font-family: Georgia, Times, 'Times new roman';
+        }
+        
 #tasklist {
     display: none;
 }
@@ -228,18 +269,19 @@ html,body {
 /* ----------------------------------------------------------------------------------- */
    
 body.active-tasks #urlbar {
-    width: 100%; height: 150px;
+    height: auto;
     
     position: static;
     
     top: auto; left: auto;
-    margin: 0; padding: 20px 0 0 0;
+    margin: 0 auto; padding: 20px 0 30px 0;
 }
 
 body.active-tasks #tasklist {
     display: block;
 }
 
+/* ----------------------------------------------------------------------------------- */
 
 @media only screen and (max-width: 479px) {
     #urlbar div.title {
@@ -251,6 +293,30 @@ body.active-tasks #tasklist {
     #urlbar input[type='button'] {
         margin: 5px 0 0 2px;
         width: 35%;
+    }
+    
+    #inputData {
+        display: block;
+        left: 0;
+    }
+        #urlbar div.left, #urlbar div.right {
+            display: block;
+            width: auto;
+        }
+        #urlbar div.left {
+            text-align: center;
+        }
+            #addTaskAddr {
+                width: 88%;
+                left: 0;
+            }
+        #urlbar div.right {
+            text-align: center;
+        }
+    
+
+    #taskExtended {
+        display: none !important;
     }
     
     #tasklist .task table tr {

@@ -15,7 +15,17 @@
 <body>
     <div id="urlbar">
         <div class="title">Download file:</div>
-        <input type="url" id="addTaskAddr" placeholder="http://.." value="" /><input type="button" id="addTaskBtn" value="Add Task" />
+        <div id="inputData">
+            <div class="left">
+                <textarea type="url" id="addTaskAddr" rows="1" placeholder="http://.." required></textarea>
+                <div class="left" id="taskExtended">
+                    <div class="multitask">Press <span class="b">Ctrl</span> + <span class="b">Enter</span> for adding more than one task</div>
+                </div>
+            </div>
+            <div class="right">
+                <input type="button" id="addTaskBtn" value="Add Task" />
+            </div>
+        </div>
     </div>
 
     <div id="tasklist"></div>

@@ -57,7 +57,7 @@
     color: #fff !important;
     position: relative;
     top: +2px;
-    opacity: .3;
+    opacity: .45;
 }
 .meter > span:after, .animate > span > span {
     content: "";

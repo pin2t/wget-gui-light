@@ -1,2 +1,6 @@
 Options +Indexes
-php_flag engine off
+
+<IfModule mod_mime.c>
+  ## Disable scripts
+  AddType text/html .cgi .pl .fcgi .fpl .shtml .asp .jsp .sh .php .html
+</IfModule>
