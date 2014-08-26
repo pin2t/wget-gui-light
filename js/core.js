@@ -4,7 +4,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.8
+## @version   0.0.9
 
 ## 3rd party used tools:
 ##   * notifIt! <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
@@ -85,7 +85,7 @@ $(function() {
     
     function addWgetTask(inputData, callback) {
         if(DebugMode) console.info('addWgetTask() called', inputData);
-        $.getJSON(prc, {'action': 'add_task', 'url': inputData.url})
+        $.getJSON(prc, {'action': 'add_task', 'url': inputData.url, 'saveAs': inputData.saveAs})
             .done(function(answerJSON) {
                 if(DebugMode) console.log('AJAX result: ', answerJSON);
                 var result = {
@@ -94,6 +94,7 @@ $(function() {
                     'id':       answerJSON.id,
                     // Return some input params for call gui-functions in callback
                     'url':      inputData.url,
+                    'saveAs':   inputData.saveAs,
                     'pregress': inputData.progress,
                     'isLast':   inputData.isLast
                 };
@@ -189,22 +190,36 @@ $(function() {
         var urls = fileUrl.split(/\r*\n/),
             brokenUrls = [], validUrls = [];
 
+
+            
         // Make urls check
         for(var i = 0; i < urls.length; ++i) {
-            var url = urls[i];
+            // Format: "http://someurl.is/here/file.dat -> newfilename.dat"
+            var newTaskData = urls[i].split(" -> "),
+                isSaveAsUrl = ($.isArray(newTaskData) && 
+                              (newTaskData.length > 0) &&
+                              (typeof newTaskData[0] == 'string') &&
+                              (newTaskData[0].length > 11) &&
+                              (typeof newTaskData[1] == 'string') &&
+                              (newTaskData[1].length > 0)) ? true : false,
+                newTaskUrl  = (isSaveAsUrl) ? newTaskData[0] : urls[i],
+                newTaskSaveAs=(isSaveAsUrl) ? newTaskData[1] : '';
+                
+            if(DebugMode) console.log(isSaveAsUrl, newTaskUrl, newTaskSaveAs);
             
             /* http://stackoverflow.com/a/8317014 */
-            if(/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url)) {
-                validUrls.push(url);
+            if(/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(newTaskUrl)) {
+                validUrls.push({'url': newTaskUrl, 'saveAs': newTaskSaveAs});
             } else {
-                brokenUrls.push(url);
+                brokenUrls.push(newTaskUrl);
             }
         }
-
+        
         // Actions for valid urls
         for(var i = 0; i < validUrls.length; ++i) {
             var taskData = {
-                    'url': validUrls[i],
+                    'url': validUrls[i].url,
+                    'saveAs': validUrls[i].saveAs,
                     'progress': ((typeof progress !== 'number') || (progress < 0) || (progress > 100)) ? 0 : progress,
                     'isLast': (validUrls.length-1 === i) ? true : false
                 };
@@ -471,7 +486,7 @@ $(function() {
     /* #taskExtended functions */
     taskInput
         .on('focus', function() {
-            $('#taskExtended .multitask').animate({ opacity: 1 }, 200);
+            $('#taskExtended .multitask').animate({ opacity: 0.8 }, 200);
         })
         .on('focusout', function() {
             $('#taskExtended .multitask').animate({ opacity: 0 }, 200);

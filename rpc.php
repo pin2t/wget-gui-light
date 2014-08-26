@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.8
+## @version   0.0.9
 ##
 ## @depends   *nix, php5, wget, bash, ps, kill, rm
 
@@ -176,8 +176,14 @@ function removeWgetTask($pid) {
 
 // IMPORTANT FUNCTION
 // Add task for a work
-function addWgetTask($url) {
+function addWgetTask($url, $saveAs) {
+    if(empty($url)) return array(
+        'result' => false,
+        'msg' => 'No URL'
+    );
+
     $speedLimit = (defined('wget_download_limit')) ? '--limit-rate='.wget_download_limit.'k ' : ' ';
+    $saveAsFile  = (!empty($saveAs)) ? '--output-document="'.download_path.'/'.$saveAs.'" ' : ' ';
     $tmpFileName = tmp_path.'/wget'.rand(1, 32768).'.log.tmp';
     
     $cmd = '('.wget.' '.
@@ -187,6 +193,7 @@ function addWgetTask($url) {
         '--user-agent="Mozilla/5.0 (X11; Linux amd64; rv:21.0) Gecko/20100101 Firefox/21.0" '.
         '--directory-prefix="'.download_path.'" '.
         $speedLimit.
+        $saveAsFile.
         ' --output-file="'.$tmpFileName.'" '.
         wget_secret_flag.' '.
         prepareUrl($url).' && '.rm.' -f "'.$tmpFileName.'") > /dev/null 2>&1 & echo $!';
@@ -302,12 +309,14 @@ $result = array('status' => -1, 'msg' => 'No input data');
 // Command line support
 if(isset($argv)) {
     if(isset($argv[1]) && !empty($argv[1])) {
-        $_GET['action'] = $argv[1];
+        @$_GET['action'] = $argv[1];
         if(isset($argv[2]) && !empty($argv[2]))
             if(validatePid($argv[2]))
-                $_GET['id'] = $argv[2];
+                @$_GET['id'] = $argv[2];
         else
-            $_GET['url'] = $argv[2];
+            @$_GET['url'] = $argv[2];
+        if(isset($argv[3]) && !empty($argv[3]))
+            @$_GET['saveAs'] = $argv[3];
     }
 }
 
@@ -321,8 +330,9 @@ if(!empty($_GET['action'])) {
     // Set value from GET array to $formData
     $formData = array(
         'action' => @$_GET['action'],
-        'url'    => @$_GET['url'],
-        'id'     => @$_GET['id']
+        'url'    => str_replace(array("'", "\"", "\\", "|", "`", "<", ">", "\n", "\r", "\t"), '', @$_GET['url']),
+        'saveAs' => str_replace(array("'", "\"", "\\", "/", "*", "|", "^", "`", "<", ">", "?", ":", "\n", "\r", "\t"), '', @$_GET['saveAs']),
+        'id'     => preg_replace("/[^0-9]/", "", @$_GET['id'])
     );
     // Make some clear
     foreach ($formData as $key => $value) {
@@ -353,9 +363,10 @@ if(!empty($_GET['action'])) {
         ## Action - Add Task
         ####################
         case 'add_task':
-            $url = $formData['url'];
+            $url    = $formData['url'];
+            $saveAs = (!empty($formData['saveAs'])) ? $formData['saveAs'] : '';
             
-            $addTaskResult = addWgetTask($url);
+            $addTaskResult = addWgetTask($url, $saveAs);
             
             if($addTaskResult['result'] === true) {
                 $result['msg']    = $addTaskResult['msg'];
