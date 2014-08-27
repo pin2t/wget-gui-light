@@ -9,4 +9,4 @@ var web_wgetguilight = {
         "page": "https://github.com/tarampampam/wget-gui-light/blob/master/HowUpdate.md",
         "file": "https://github.com/tarampampam/nod32-update-mirror/archive/master.zip"
     }
-}};
+};
