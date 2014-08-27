@@ -4,9 +4,9 @@ var web_wgetguilight = {
     "lastUpdate": {
         "shortDesc": "Some security fixes, new features",
         "fullDescUrl": "https://github.com/tarampampam/nod32-update-mirror"
-    }
+    },
     "download": {
         "page": "https://github.com/tarampampam/wget-gui-light/blob/master/HowUpdate.md",
         "file": "https://github.com/tarampampam/nod32-update-mirror/archive/master.zip"
     }
-};
+}};
