@@ -1,6 +1,6 @@
 var web_wgetguilight = {
     "version": "0.0.12",
-    "name": "Wget GUI light v0.0.12",
+    "name": "Wget GUI light",
     "lastUpdate": {
         "shortDesc": "Some security fixes, new features",
         "fullDescUrl": "https://github.com/tarampampam/nod32-update-mirror"
