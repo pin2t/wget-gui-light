@@ -3,7 +3,7 @@ var web_wgetguilight = {
     "name": "Wget GUI light",
     "lastUpdate": {
         "shortDesc": "Logging in rpc.php, checking for new versions in gui, a lot of small fixes",
-        "fullDescUrl": "https://github.com/tarampampam/wget-gui-light"
+        "fullDescUrl": "https://github.com/tarampampam/wget-gui-light/blob/master/cahngeslog.md"
     },
     "download": {
         "page": "https://github.com/tarampampam/wget-gui-light/blob/master/HowUpdate.md",
