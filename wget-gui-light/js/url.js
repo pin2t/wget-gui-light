@@ -64,26 +64,28 @@ URL.prototype = {
 	parse: function(){
 		this.res = /^(?:([a-z0-9_\-\.]+):\/\/)*(?:([a-z0-9_\-\.]+)(?:\:)*([a-z0-9_\-\.]+)*\@)*([a-z0-9][a-z0-9_\-\.]+)(?:\:([\d]+))*(?:\/([^?#]*))*(?:\?([^?#]*))*(?:\#([^?#]*))*/gi.exec( this.url );
 		
-		this.data.scheme = this.res[ 1 ] || false;
-		this.data.user = this.res[ 2 ] || false;
-		this.data.pass = this.res[ 3 ] || false;
-		this.data.host = this.res[ 4 ] || false;
-		this.data.port = this.res[ 5 ] || false;
-		this.data.path = this.res[ 6 ] || false;
-		this.data.query = this.res[ 7 ] || false;
-		this.data.fragment = this.res[ 8 ] || false;
-		
-		if( this.data.query ){
-			this.data.params = {};
-			this.parts = this.data.query.split( '&' );
-			for(  var i = 0; i < this.parts.length; i++ ){
-				param = this.parts[ i ].split( '=' );
-				this.data.params[ param[ 0 ] ] = decodeURIComponent( param[ 1 ] );
-			}
-		}
-		
-		delete this.res;	
-		delete this.parts;	
+        if (this.res != null){ // _Added_ by <hand.pda@gmail.com>
+            this.data.scheme = this.res[ 1 ] || false;
+            this.data.user = this.res[ 2 ] || false;
+            this.data.pass = this.res[ 3 ] || false;
+            this.data.host = this.res[ 4 ] || false;
+            this.data.port = this.res[ 5 ] || false;
+            this.data.path = this.res[ 6 ] || false;
+            this.data.query = this.res[ 7 ] || false;
+            this.data.fragment = this.res[ 8 ] || false;
+            
+            if( this.data.query ){
+                this.data.params = {};
+                this.parts = this.data.query.split( '&' );
+                for(  var i = 0; i < this.parts.length; i++ ){
+                    param = this.parts[ i ].split( '=' );
+                    this.data.params[ param[ 0 ] ] = decodeURIComponent( param[ 1 ] );
+                }
+            }
+            
+            delete this.res;	
+            delete this.parts;	
+        } // _Added_ by <hand.pda@gmail.com>
 	},
 
 	update: function(){

@@ -1,0 +1,1 @@
+var WGET_GUI_LIGHT_VERSION = '0.0.13';

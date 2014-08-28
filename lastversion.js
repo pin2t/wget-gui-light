@@ -1,9 +1,9 @@
 var web_wgetguilight = {
-    "version": "0.0.12",
+    "version": "0.0.13",
     "name": "Wget GUI light",
     "lastUpdate": {
-        "shortDesc": "Some security fixes, new features",
-        "fullDescUrl": "https://github.com/tarampampam/nod32-update-mirror"
+        "shortDesc": "Logging in rpc.php, checking for new versions in gui, a lot of small fixes",
+        "fullDescUrl": "https://github.com/tarampampam/wget-gui-light"
     },
     "download": {
         "page": "https://github.com/tarampampam/wget-gui-light/blob/master/HowUpdate.md",

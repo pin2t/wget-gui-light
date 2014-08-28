@@ -4,17 +4,20 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   0.0.9
+## @version   Search in 'version.js'
 
 ## 3rd party used tools:
-##   * notifIt! <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
-##   * jquery   <http://jquery.com/>
-##   * url.js   <http://habrahabr.ru/post/232073/>
+##   * jquery           <http://jquery.com/>
+##   * notifIt!         <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
+##   * url.js           <http://habrahabr.ru/post/232073/>
+##   * jquery.cookie.js <https://github.com/carhartl/jquery-cookie>
+##   * bpopup           <http://dinbror.dk/bpopup/>
 */
 'use strict';
 
 $(function() {
     var body = $('body').first(),
+        head = $('head').first(),
         root = $('#tasklist'),
         favicon = $('#favicon'),
         taskInput = $('#addTaskAddr'),
@@ -22,16 +25,24 @@ $(function() {
         pageTitle = $(document).find('title'),
         titleText = pageTitle.text(),
         timerHandler = null,
+        wgetGuiCurrentVersion = (typeof WGET_GUI_LIGHT_VERSION === 'string') ? WGET_GUI_LIGHT_VERSION : false, /* declared in 'version.js' */
+        
+        /* How many requests can be passed in one time */
+        addTasksLimitCount = 5,
         
         /* Update interval (in milliseconds). Interval for checking change data loop */
-        updateStatusInterval = 3 * 1000,
+        updateStatusInterval = 5 * 1000,
         
         /* Debug mode (true|false). Enable console.log output */
         DebugMode = false,
         
+        /* Enable checking for newest versions */
+        CheckForUpdates = true,
+        
         /* IMPORTANT! Path for AJAX requests */
         prc = 'rpc.php';
 
+    if(DebugMode) updateStatusInterval = 0;
     /* *** DESIGN ******************************************************************** */
 
     /* Animate progress bar */
@@ -49,6 +60,10 @@ $(function() {
     
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    function clearString(str) {
+        return str.replace(/<\/?[^>]+(>|$)/g, "");
     }
     
     /* *** TASKS FUNCTIONS *********************************************************** */
@@ -176,6 +191,9 @@ $(function() {
     
     /* add task function */
     function addTask(fileUrl, progress) {
+        // Make some clear
+        fileUrl = clearString(fileUrl);
+        
         // Make fast check
         if((typeof fileUrl !== 'string') || (fileUrl == '')) {
             notif({type: "warning", position: "center", msg: "Address cannot be empty"});
@@ -209,7 +227,8 @@ $(function() {
             
             /* http://stackoverflow.com/a/8317014 */
             if(/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(newTaskUrl)) {
-                validUrls.push({'url': newTaskUrl, 'saveAs': newTaskSaveAs});
+                if ((typeof addTasksLimitCount == 'number') && (addTasksLimitCount > 0) && validUrls.length < addTasksLimitCount)
+                    validUrls.push({'url': newTaskUrl, 'saveAs': newTaskSaveAs});
             } else {
                 brokenUrls.push(newTaskUrl);
             }
@@ -226,12 +245,26 @@ $(function() {
                 
             // Timer needed for tasks stack (create task order)
             setTimeout(function(taskData){
+                // Call Ajax function
                 addWgetTask(taskData, function(result){
-                    if((result !== false) && (result.status == '1')) {
-                        addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id});
-                        if(result.isLast) syncTasksList(); // If it is last task in stack - make sync
+                    // If result is 'good'
+                    if((result !== false) && (typeof result.status === 'number') && (result.status === 1)) {
+                        // and returned 'id' (pid) is correct
+                        if((typeof result.id === 'number') && (result.id > 1)) {
+                            // Add task to gui
+                            addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id});
+                        } else
+                            // or only show message
+                            notif({type: "warning", multiline: true, time: 10000, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
+                        // If it is last task in stack - make sync
+                        if(result.isLast) syncTasksList();
                     } else {
-                        notif({type: "error", multiline: true, position: "center", msg: 'Download "<b>'+result.url+'</b>" not added'});
+                        // If returned error with correct message in answer
+                        if((result !== false) && (typeof result.url === 'string') && (typeof result.msg === 'string'))
+                            notif({type: "error", multiline: true, time: 10000, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
+                        // If all is bad =)
+                        else
+                            notif({type: "error", multiline: true, position: "center", msg: 'Download not added, server error'});
                     }
                 });
             }, 150 * i, taskData/* <--- pass settings object to timer */);
@@ -254,9 +287,6 @@ $(function() {
         });
     }
     
-    //addTaskGui({'url': 'http://foo.com/bar.dat', 'progress': 50, 'id': 666}); // TODO: Remove this
-    //addTaskGui({'url': 'http://foo.com/bar.dat2', 'progress': 60, 'id': 777}); // TODO: Remove this
-    
     function syncTasksList() {
         /* Здесь всё таки нужен подробный комментарий. Функция для сихронизации данных полученных от сервера
            и тех, что отображены на gui. Мы получаем список актуальных задач путем вызова 'getWgetTasksList',
@@ -273,8 +303,23 @@ $(function() {
         getWgetTasksList(function(Tasks){
             var guiTasks = root.find('div.task'),
                 SyncedTasksIDs = [], AddedTasksIDs = [], RemovedTasksIDs = [],
-                GuiTasksIDs = [], RemoteTasksIDs = [];
+                GuiTasksIDs = [], RemoteTasksIDs = [],
+                duplicatesFounded = false;
             
+            // Remove duplicated tasks
+            jQuery.each(guiTasks, function() {
+                if(typeof this !== 'undefined') {
+                    var guiTaskData = $(this).data('info');
+                    if(typeof guiTaskData !== 'undefined') {
+                        var tasks = $('div.task.id'+guiTaskData.id);
+                        if(tasks.size() > 1) {
+                            duplicatesFounded = true;
+                            tasks.not(':first').remove();
+                        }
+                    }
+                }
+            });
+            if(duplicatesFounded) guiTasks = root.find('div.task'); // Refresh
             
             jQuery.each(Tasks, function() {
                 var wgetTask = this;
@@ -294,15 +339,17 @@ $(function() {
 
             // +Get GuiTasksIDs
             jQuery.each(guiTasks, function() {
-                var guiTaskData = $(this).data('info');
-                if(typeof guiTaskData !== 'undefined')
-                    GuiTasksIDs.push(guiTaskData.id);
+                if(typeof this !== 'undefined') {
+                    var guiTaskData = $(this).data('info');
+                    if(typeof guiTaskData !== 'undefined')
+                        GuiTasksIDs.push(guiTaskData.id);
+                }
             });
             
-            // +Get RemovedTasksIDs (http://stackoverflow.com/a/15385871)
+            // +Get RemovedTasksIDs <http://stackoverflow.com/a/15385871>
             var RemovedTasksIDs = $(GuiTasksIDs).not(RemoteTasksIDs).get();
             
-            // +Get AddedTasksIDs (http://stackoverflow.com/a/15385871)
+            // +Get AddedTasksIDs <http://stackoverflow.com/a/15385871>
             var AddedTasksIDs = $(RemoteTasksIDs).not(GuiTasksIDs).get();
             
             
@@ -349,7 +396,7 @@ $(function() {
                 break;
             case 'active-tasks':
                 body.addClass("active-tasks");
-                favicon.attr("href","img/favicon_inactive.png");
+                favicon.attr("href","img/favicon_active.png");
                 break;
         }
         return true;
@@ -497,11 +544,104 @@ $(function() {
         var url = $.urlParam('url');
         taskInput.val(url); taskButton.click();
     }
-    $("#bookmark").attr("href", "javascript:window.open('"+document.URL+"?action=add&url='+window.location.toString());void 0;")
+    $("#bookmark")
+        .attr("href", "javascript:window.open('"+document.URL+"?action=add&url='+window.location.toString());void 0;")
+        .on('click', function(){
+            notif({msg: "Move me to your <b>bookmarks bar</b>, don't click here :)", position: "center", time: 5000, opacity: 0.8});
+            return false;
+        });
+    
+    /* *** Need Update Notification ************************************************** */
+    
+    function checkProjectUpdate() {
+        // <http://stackoverflow.com/a/14540169>
+        // @returns {Integer} 0: v1 == v2, -1: v1 < v2, 1: v1 > v2
+        function versionCompare(n,t){var e,r,i,l=(""+n).split("."),a=(""+t).split("."),h=Math.min(l.length,a.length);
+        for(i=0;h>i;i++)if(e=parseInt(l[i],10),r=parseInt(a[i],10),isNaN(e)&&(e=l[i]),isNaN(r)&&(r=a[i]),e!=r)return e>r?1:r>e?-1:0/0;
+        return l.length===a.length?0:l.length<a.length?-1:1}
+        
+        var CheckNewVersionNow = true;
+        if(typeof $.cookie !== 'undefined') {
+            // Disable update check for a day (CHECK cookie value)
+            CheckNewVersionNow = ($.cookie('DoNotCheckUpdate') == 'true') ? false : true;
+        }
+        if(CheckNewVersionNow) {
+            // <http://rawgit.com/>
+            $.getScript('https://rawgit.com/tarampampam/wget-gui-light/master/lastversion.js', function(){
+            try { // TODO: Comment while testing
+                // Check returned value in script. and local (declared in 'version.js')
+                if((typeof web_wgetguilight !== 'undefined') && (typeof web_wgetguilight.version === 'string') &&
+                   (web_wgetguilight.version !== '') && (typeof wgetGuiCurrentVersion === 'string') &&
+                   wgetGuiCurrentVersion.length > 3) {
+                    // Compare local and web versions
+                    // If web version is newest then local
+                    if(versionCompare(wgetGuiCurrentVersion, web_wgetguilight.version) < 0) {
+                        var webVer = web_wgetguilight;
+                        $('#footer').append('<a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank"style="white-space:nowrap;text-overflow:clip;overflow:hidden">Update available</a>');//
+                        var updateLink = $('#updateAvailable'), 
+                            updateLinkOrigWidth = updateLink.width();
+                        // Animate showing notification link
+                        updateLink.css({width: 0}).animate({width: updateLinkOrigWidth}, 1000);
+                        // Load popup script <http://dinbror.dk/bpopup/>
+                        $.getScript('js/jquery.bpopup/jquery.bpopup.min.js', function(){
+                            // Load css
+                            $('<link>')
+                                .appendTo(head)
+                                .attr({type : 'text/css', rel : 'stylesheet'})
+                                .attr('href', 'js/jquery.bpopup/jquery.bpopup.css?rnd='+getRandomInt(0,2047)); // disable caching
+                            // Create popup container details
+                            body.append('<div id="updateDetails" style="display:none">'+
+                                            '<span class="button popupClose">'+
+                                                '<span>X</span>'+
+                                            '</span>'+
+                                            '<h2 class="name">'+webVer.name+'</h2>'+
+                                            '<h3 class="curentver">Current version: '+wgetGuiCurrentVersion+'</h3>'+
+                                            '<h3 class="availablever">Available version: <strong>'+webVer.version+'</strong></h3>'+
+                                            '<p class="desc">'+webVer.lastUpdate.shortDesc+' // <a href="'+webVer.lastUpdate.fullDescUrl+'" target="_blank">Full text</a></p>'+
+                                            '<div class="links">'+
+                                                '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="http://oi58.tinypic.com/2jbv9c7.jpg" width="64" height="64" /><br />Info page</a>'+
+                                                '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="http://oi62.tinypic.com/2zi36on.jpg" width="64" height="64" /><br />Package</a>'+
+                                                '<div class="clear"></a>'+
+                                            '</div>'+
+                                            '<p class="disable">'+
+                                                '<a href="#" id="disableUpdateCheck">Disable updates checking</a>'+
+                                                '<span>Setting will stored in cookies</span>'+
+                                            '</p>'+
+                                        '</div>');
+                            // Attach event to notification link
+                            updateLink.on('click', function(){
+                                // Show popup
+                                $('#updateDetails').bPopup({
+                                    modalColor: '#666',
+                                    opacity: 0.3,
+                                    closeClass: 'popupClose',
+                                    position: ['auto', 'auto'],
+                                    transition: 'fadeIn'
+                                });
+                                return false;
+                            });
+                            // Attach event to 'disable update check' link
+                            $('#disableUpdateCheck').on('click', function(){
+                                // Disable update check for a N days (SET cookie value)
+                                if(typeof $.cookie !== 'undefined') {
+                                    $.cookie('DoNotCheckUpdate', 'true', {expires : 93});
+                                    notif({type: "warning", msg: "Disabled", position: "center", time: 1000, width: 150, opacity: 0.8});
+                                }
+                                return false;
+                            });
+                        });
+                    } else {
+                        console.log('Update not available');
+                    }
+                }
+            } catch(e) {console.log('Error on checking update : ' + e);}// TODO: Comment while testing
+            });
+        }
+    }
     
     /* *** Here we go! :) ************************************************************ */
     
     syncTasksList(); // Run timer
     taskInput.focus(); // Set focus to input
-    
+    if(CheckForUpdates) checkProjectUpdate(); // Check new version, if this function is enabled
 });

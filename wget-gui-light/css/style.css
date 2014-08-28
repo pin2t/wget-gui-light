@@ -20,6 +20,10 @@ label,article,details,footer,header,menu,nav,input,textarea,select {
     width: 0;
 }
 
+.hidden {
+    display: none;
+}
+
 li {
     list-style: none;
 }
@@ -87,7 +91,7 @@ html,body {
         font-family: Georgia, Times, 'Times new roman';
         
         position: relative;
-        padding: 6px; left: -12px;
+        padding: 7px; left: -12px;
         resize: vertical; max-height: 200px;
         
         width: 100%;
@@ -123,7 +127,7 @@ html,body {
         cursor: default;
         font-size: 9px;
         opacity: .8;
-        transition: all .05s ease;
+        transition: all .2s ease;
     }
         #taskExtended:hover {
             opacity: 1;
@@ -264,9 +268,12 @@ html,body {
         color: #777;
         /*font-weight: bold;*/
         text-decoration: none;
+        transition: all .3s ease;
+        position: relative;
+        top: 2px;
     }
         #footer a:hover {
-            text-decoration: underline;
+            color: #111;
         }
     
     #footer .button {
@@ -275,11 +282,20 @@ html,body {
         margin: 0 6px;
         border-radius: 15px;
         text-decoration: none;
+        transition: all .1s linear;
     }
         #footer .button > * {
             text-decoration: none;
             color: #fff;
             text-shadow: 0px 1px 2px rgba(130, 130, 130, 1);
+            position: relative;
+            top: 0;
+        }
+        #footer .button > a:hover {
+            color: #fff;
+        }
+        #footer .button:hover {
+            margin: 0 12px;
         }
 
 /* ----------------------------------------------------------------------------------- */
@@ -353,13 +369,3 @@ body.active-tasks #tasklist {
         font-size: 10px;
     }
 }
-
-
-
-
-
-
-
-
-
-
