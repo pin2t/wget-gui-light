@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png) &nbsp; ![license MIT](http://gitshields.com/v2/text/os/linux/orange.png) &nbsp; ![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png) &nbsp; ![version](http://gitshields.com/v2/text/version/0.0.13/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png) &nbsp; ![license MIT](http://gitshields.com/v2/text/os/linux/orange.png) &nbsp; ![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png) &nbsp; ![version](http://gitshields.com/v2/text/version/0.0.14/lightgrey.png)
 
 Web-интерфейс для [wget] - программы загрузки файлов по сети. Построен на Ajax+css3 с клиентской стороны, и **php** с серверной. Требования к системе, на которой разворачивается данное решение:
 
