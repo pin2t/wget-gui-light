@@ -304,7 +304,10 @@ function addWgetTask($url, $saveAs) {
             bash('mkdir -p "'.download_path.'"; chmod 0777 "'.download_path.'/"'); // Second - by shell
             if(checkPermissions()) { // Finally check
                 log::error('Directory '.var_export(download_path, true).' cannot be created');
-                return false;
+	        return array(
+	            'result' => false,
+	            'msg' => 'Cannot create directory for downloads'
+	        );
             }
         }
     }
