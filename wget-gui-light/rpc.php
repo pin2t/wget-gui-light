@@ -31,7 +31,6 @@ define('download_path', BASEPATH.'/downloads');
 ##     getting progress in background job, and will be deleted automatically
 ##     on finish or cancel task (thx to <https://github.com/ghospich>)
 ##     (without '/' at the end).
-##     CHANGE DEFAULT PATH
 define('tmp_path', '/tmp');
 
 ## Write logs messages to some directory. Uncomment this line for enable 
@@ -145,7 +144,7 @@ class log {
         if(!self::checkPermissions()) {
             mkdir(log_path, 0777, true); chmod(log_path, 0777); // First attempt to create path - by php
             if(!self::checkPermissions()) {
-                bash('mkdir -p "'.log_path.'"; chmod -R 0777 "'.log_path.'/"'); // Second - by shall
+                bash('mkdir -p "'.log_path.'"; chmod 0777 "'.log_path.'/"'); // Second - by shell
                 if(!self::checkPermissions()) { // Finally check
                     return false;
                 }
@@ -281,6 +280,10 @@ function removeWgetTask($pid) {
 // IMPORTANT FUNCTION
 // Add task for a work
 function addWgetTask($url, $saveAs) {
+    function checkPermissions() {
+        return (!file_exists(download_path) || !is_dir(download_path) || !is_writable(download_path)) ? false : true;
+    }
+    
     log::debug('(call) addWgetTask() called, $url='.var_export($url, true).', $saveAs='.var_export($saveAs, true));
     if(empty($url)) return array(
         'result' => false,
@@ -295,6 +298,17 @@ function addWgetTask($url, $saveAs) {
         );
     }
 
+    if(checkPermissions()) {
+        mkdir(download_path, 0777, true); chmod(download_path, 0777); // First attempt to create path - by php
+        if(checkPermissions()) {
+            bash('mkdir -p "'.download_path.'"; chmod 0777 "'.download_path.'/"'); // Second - by shell
+            if(checkPermissions()) { // Finally check
+                log::error('Directory '.var_export(download_path, true).' cannot be created');
+                return false;
+            }
+        }
+    }
+ 
     $speedLimit = (defined('wget_download_limit')) ? '--limit-rate='.wget_download_limit.'k ' : ' ';
     $saveAsFile  = (!empty($saveAs)) ? '--output-document="'.download_path.'/'.$saveAs.'" ' : ' ';
     $tmpFileName = tmp_path.'/wget'.rand(1, 32768).'.log.tmp';

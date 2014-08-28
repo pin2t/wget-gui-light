@@ -567,75 +567,76 @@ $(function() {
         }
         if(CheckNewVersionNow) {
             // <http://rawgit.com/>
-            $.getScript('https://rawgit.com/tarampampam/wget-gui-light/master/lastversion.js', function(){
             try { // TODO: Comment while testing
-                // Check returned value in script. and local (declared in 'version.js')
-                if((typeof web_wgetguilight !== 'undefined') && (typeof web_wgetguilight.version === 'string') &&
-                   (web_wgetguilight.version !== '') && (typeof wgetGuiCurrentVersion === 'string') &&
-                   wgetGuiCurrentVersion.length > 3) {
-                    // Compare local and web versions
-                    // If web version is newest then local
-                    if(versionCompare(wgetGuiCurrentVersion, web_wgetguilight.version) < 0) {
-                        var webVer = web_wgetguilight;
-                        $('#footer').append('<a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank"style="white-space:nowrap;text-overflow:clip;overflow:hidden">Update available</a>');//
-                        var updateLink = $('#updateAvailable'), 
-                            updateLinkOrigWidth = updateLink.width();
-                        // Animate showing notification link
-                        updateLink.css({width: 0}).animate({width: updateLinkOrigWidth}, 1000);
-                        // Load popup script <http://dinbror.dk/bpopup/>
-                        $.getScript('js/jquery.bpopup/jquery.bpopup.min.js', function(){
-                            // Load css
-                            $('<link>')
-                                .appendTo(head)
-                                .attr({type : 'text/css', rel : 'stylesheet'})
-                                .attr('href', 'js/jquery.bpopup/jquery.bpopup.css?rnd='+getRandomInt(0,2047)); // disable caching
-                            // Create popup container details
-                            body.append('<div id="updateDetails" style="display:none">'+
-                                            '<span class="button popupClose">'+
-                                                '<span>X</span>'+
-                                            '</span>'+
-                                            '<h2 class="name">'+webVer.name+'</h2>'+
-                                            '<h3 class="curentver">Current version: '+wgetGuiCurrentVersion+'</h3>'+
-                                            '<h3 class="availablever">Available version: <strong>'+webVer.version+'</strong></h3>'+
-                                            '<p class="desc">'+webVer.lastUpdate.shortDesc+' // <a href="'+webVer.lastUpdate.fullDescUrl+'" target="_blank">Full text</a></p>'+
-                                            '<div class="links">'+
-                                                '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="http://oi58.tinypic.com/2jbv9c7.jpg" width="64" height="64" /><br />Info page</a>'+
-                                                '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="http://oi62.tinypic.com/2zi36on.jpg" width="64" height="64" /><br />Package</a>'+
-                                                '<div class="clear"></a>'+
-                                            '</div>'+
-                                            '<p class="disable">'+
-                                                '<a href="#" id="disableUpdateCheck">Disable updates checking</a>'+
-                                                '<span>Setting will stored in cookies</span>'+
-                                            '</p>'+
-                                        '</div>');
-                            // Attach event to notification link
-                            updateLink.on('click', function(){
-                                // Show popup
-                                $('#updateDetails').bPopup({
-                                    modalColor: '#666',
-                                    opacity: 0.3,
-                                    closeClass: 'popupClose',
-                                    position: ['auto', 'auto'],
-                                    transition: 'fadeIn'
+                $.getScript('https://rawgit.com/tarampampam/wget-gui-light/master/lastversion.js', function(){
+                    // Check returned value in script. and local (declared in 'version.js')
+                    if((typeof web_wgetguilight !== 'undefined') && (typeof web_wgetguilight.version === 'string') &&
+                       (web_wgetguilight.version !== '') && (typeof wgetGuiCurrentVersion === 'string') &&
+                       wgetGuiCurrentVersion.length > 3) {
+                        // Compare local and web versions
+                        // If web version is newest then local
+                        if(versionCompare(wgetGuiCurrentVersion, web_wgetguilight.version) < 0) {
+                            var webVer = web_wgetguilight;
+                            $('#footer').append('<a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank"style="white-space:nowrap;text-overflow:clip;overflow:hidden">Update available</a>');//
+                            var updateLink = $('#updateAvailable'), 
+                                updateLinkOrigWidth = updateLink.width();
+                            // Animate showing notification link
+                            updateLink.css({width: 0}).animate({width: updateLinkOrigWidth}, 1000);
+                            // Load popup script <http://dinbror.dk/bpopup/>
+                            $.getScript('js/jquery.bpopup/jquery.bpopup.min.js', function(){
+                                // Load css
+                                $('<link>')
+                                    .appendTo(head)
+                                    .attr({type : 'text/css', rel : 'stylesheet'})
+                                    .attr('href', 'js/jquery.bpopup/jquery.bpopup.css?rnd='+getRandomInt(0,2047)); // disable caching
+                                // Create popup container details
+                                body.append('<div id="updateDetails" style="display:none">'+
+                                                '<span class="button popupClose">'+
+                                                    '<span>X</span>'+
+                                                '</span>'+
+                                                '<h2 class="name">'+webVer.name+'</h2>'+
+                                                '<h3 class="curentver">Current version: '+wgetGuiCurrentVersion+'</h3>'+
+                                                '<h3 class="availablever">Available version: <strong>'+webVer.version+'</strong></h3>'+
+                                                '<p class="desc">'+webVer.lastUpdate.shortDesc+' // <a href="'+webVer.lastUpdate.fullDescUrl+'" target="_blank">Full text</a></p>'+
+                                                '<div class="links">'+
+                                                    '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="http://oi58.tinypic.com/2jbv9c7.jpg" width="64" height="64" /><br />Info page</a>'+
+                                                    '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="http://oi62.tinypic.com/2zi36on.jpg" width="64" height="64" /><br />Package</a>'+
+                                                    '<div class="clear"></a>'+
+                                                '</div>'+
+                                                '<p class="disable">'+
+                                                    '<a href="#" id="disableUpdateCheck">Disable updates checking</a>'+
+                                                    '<span>Setting will stored in cookies</span>'+
+                                                '</p>'+
+                                            '</div>');
+                                // Attach event to notification link
+                                updateLink.on('click', function(){
+                                    // Show popup
+                                    $('#updateDetails').bPopup({
+                                        modalColor: '#666',
+                                        opacity: 0.3,
+                                        closeClass: 'popupClose',
+                                        position: ['auto', 'auto'],
+                                        transition: 'fadeIn'
+                                    });
+                                    return false;
                                 });
-                                return false;
+                                // Attach event to 'disable update check' link
+                                $('#disableUpdateCheck').on('click', function(){
+                                    // Disable update check for a N days (SET cookie value)
+                                    if(typeof $.cookie !== 'undefined') {
+                                        $.cookie('DoNotCheckUpdate', 'true', {expires : 93});
+                                        notif({type: "warning", msg: "Disabled", position: "center", time: 1000, width: 150, opacity: 0.8});
+                                    }
+                                    return false;
+                                });
                             });
-                            // Attach event to 'disable update check' link
-                            $('#disableUpdateCheck').on('click', function(){
-                                // Disable update check for a N days (SET cookie value)
-                                if(typeof $.cookie !== 'undefined') {
-                                    $.cookie('DoNotCheckUpdate', 'true', {expires : 93});
-                                    notif({type: "warning", msg: "Disabled", position: "center", time: 1000, width: 150, opacity: 0.8});
-                                }
-                                return false;
-                            });
-                        });
-                    } else {
-                        console.log('Update not available');
+                        } else {
+                            if(DebugMode) console.log('Update not available');
+                        }
                     }
-                }
-            } catch(e) {console.log('Error on checking update : ' + e);}// TODO: Comment while testing
-            });
+                });
+            } catch(e) {console.log('Error on checking update : ' + e)}// TODO: Comment while testing
+            
         }
     }
     

@@ -1,8 +1,8 @@
 var web_wgetguilight = {
-    "version": "0.0.13",
+    "version": "0.0.14",
     "name": "Wget GUI light",
     "lastUpdate": {
-        "shortDesc": "Logging in rpc.php, checking for new versions in gui, a lot of small fixes",
+        "shortDesc": "Added checking for existing and writable download directory, small fixes",
         "fullDescUrl": "https://github.com/tarampampam/wget-gui-light/blob/master/cahngeslog.md"
     },
     "download": {
