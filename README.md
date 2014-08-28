@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png) ![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)  ![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png) ![version](http://gitshields.com/v2/text/version/0.1.0/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png) &nbsp; ![license MIT](http://gitshields.com/v2/text/os/linux/orange.png) &nbsp; ![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png) &nbsp; ![version](http://gitshields.com/v2/text/version/0.0.13/lightgrey.png)
 
 Web-интерфейс для [wget] - программы загрузки файлов по сети. Построен на Ajax+css3 с клиентской стороны, и **php** с серверной. Требования к системе, на которой разворачивается данное решение:
 
@@ -130,26 +130,13 @@ Answer:
 
 При нажатии на F5 происходит принудительное обновление задач, страница перезагружается только по нажатию на кнопку обновления в браузере.
 
-### Установка
+### [Установка / обновление]
 
- * Скачать или склонировать крайнюю версию репозитория;
-Распаковать в директорию, доступную «извне»;
- * Изменить путь "`define('download_path', BASEPATH.'/downloads');`" в «rpc.php», внести другие необходимые изменения;
- * Открыть в браузере, проверить работоспособность. В случае возникновения ошибок — [задайте вопрос].
+### [История изменений]
 
+#### [Пост на хабре]
 
-### История изменений
-
- * **0.0.13** - Большое количество различных изменений, функция логирования в `rpc.php`, проверки новой версии в GUI, другие мелкие доработки и изменения
- * 0.0.9 - Добавлена возможность задания имени сохраняемого файла, путем добавления к URL в GUI строки вида "` -> filename.ext`" (полный вид запроса при этом будет "`htttp://somehost.io/oldfilename.zip -> newfilename.zip`"), добавлена  дополнительная проверка входных данных
- * 0.0.8 - Добавлена проверка директории для временных файлов, добавлена возможность добавления нескольких задач в GUI, мелкие доработки (в основном в визуальной части)
- * 0.0.7 - В функцию тестирования добавлена проверка на существование и разрешение на запись в `download_path` (http://goo.gl/I8gYoK)
- * 0.0.6 - Вызов `ps aux` изменен на `ps -ewwo pid,args` для ускорения парсинга (issue #8)
- * 0.0.5 — Обновления безопасности, исправлено ошибочное сообщение об ошибке при добавлении задачи, функции возвращают не просто результат true|false - а плюс описание, добавлена поддержка работы с параметрами запуска из консоли (терминала), добавлена функция тестирования сервера (в gui - вместо url передать слово "test"), другие мелкие исправления
- * 0.0.4 — Добавлено автоматическое удаление лог-файлов wget-а, мелкие исправления
- * 0.0.3 — Релиз на гитхабе
-
-[Пост на хабре]
+В случае возникновения ошибок — [задайте вопрос].
 
 ### Лицензия: **MIT**
 Copyright © 2014 Samoylov Nikolay
@@ -171,6 +158,8 @@ Copyright © 2014 Samoylov Nikolay
 
 [Пост на хабре]:http://habrahabr.ru/post/234353/
 [wget]:https://ru.wikipedia.org/wiki/Wget
+[Установка / обновление]:https://github.com/tarampampam/wget-gui-light/blob/master/HowUpdate.md
+[История изменений]:https://github.com/tarampampam/wget-gui-light/blob/master/cahngeslog.md
 [задайте вопрос]:https://github.com/tarampampam/wget-gui-light/issues/new
 [notifIt]:https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html
 [jquery]:http://jquery.com/
