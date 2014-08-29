@@ -42,7 +42,7 @@ function saveSettings(callback) {
     saveInStorage({
         'pathToRpc': globSettings.pathToRpc
     }, function(result) {
-        console.info('Settings saved');
+        //console.info('Settings saved');
         if(typeof(callback) == "function") callback(true);
         return true;
     });
@@ -57,7 +57,7 @@ function loadSetting(callback) {
         // If value not stored (loaded as 'undefined') - setup default (or setted in past) value
         setPathToRpc((typeof(value.pathToRpc) !== "undefined") ? value.pathToRpc : globSettings.pathToRpc);
         
-        console.info('Settings loaded');
+        //console.info('Settings loaded');
         if(typeof(callback) == "function") callback(true);
         return true;
     });
@@ -168,7 +168,7 @@ loadSetting(function(){
     
     chrome.contextMenus.onClicked.addListener(function(info, tab) {
         if (info.menuItemId === globMenuItemID) {
-            var downloadURL = info.srcUrl || info.linkUrl;
+            var downloadURL = info.linkUrl || info.srcUrl;
             if(validateUrl(globSettings.pathToRpc)) {
                 try {
                     var requestString = globSettings.pathToRpc+'?action=add_task&url='+downloadURL;

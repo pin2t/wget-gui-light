@@ -16,7 +16,7 @@
 
 ## Add debug info to log and output. Comment this line or set 'false' for 
 ##   disable this feature
-define('DebugMode', false);
+#define('DebugMode', true);
 
 ## Settings paths
 ##   Path to directory, where this script located
@@ -82,12 +82,6 @@ if(!defined('wget')) define('wget', 'wget');
 if(!defined('ps'))   define('ps', 'ps');
 if(!defined('kill')) define('kill', 'kill');
 if(!defined('rm'))   define('rm', 'rm');
-
-// Prepare url before downloading
-function prepareUrl($url) {
-    // TODO: Write something more secured :)
-    return escapeshellarg($url);
-}
 
 // Make system command call, return result as string or array
 function bash($cmd, $result_type = '') {
@@ -324,11 +318,12 @@ function addWgetTask($url, $saveAs) {
         '--user-agent="Mozilla/5.0 (X11; Linux amd64; rv:21.0) Gecko/20100101 Firefox/21.0" '.
         '--directory-prefix="'.download_path.'" '.
         '--content-disposition '. // by <https://github.com/CodingFu>
+        '--restrict-file-names=nocontrol '. // For Cyrillic correct filenames
         $speedLimit.
         $saveAsFile.
         ' --output-file="'.$tmpFileName.'" '.
         wget_secret_flag.' '.
-        prepareUrl($url).'; '.rm.' -f "'.$tmpFileName.'") > /dev/null 2>&1 & echo $!';
+        '"'.$url.'"; '.rm.' -f "'.$tmpFileName.'") > /dev/null 2>&1 & echo $!';
     
     log::debug('Command to exec: '.var_export($cmd, true));
     
