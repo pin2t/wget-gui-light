@@ -16,7 +16,6 @@
 
 ## Add debug info to log and output. Comment this line or set 'false' for 
 ##   disable this feature
-#define('DebugMode', false);
 define('DebugMode', false);
 
 ## Settings paths
@@ -26,8 +25,7 @@ define('BASEPATH', realpath(dirname(__FILE__)));
 ##   Path to downloads directory. Any files will download to this path 
 ##     (without '/' at the end).
 ##     CHANGE DEFAULT PATH
-#define('download_path', BASEPATH.'/downloads');
-define('download_path', '/DataVolume/shares/Public/Downloads/wget');
+define('download_path', BASEPATH.'/downloads');
 
 ##   Path to temp files directory. Temp files will created by 'wget' for 
 ##     getting progress in background job, and will be deleted automatically
