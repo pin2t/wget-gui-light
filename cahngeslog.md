@@ -1,6 +1,10 @@
 ## История изменений
 
-2014-08-28  / Kot @[tarampampam]
+0.0.15
+----------
+ * Написано и опубликовано расширение для браузера "Google Chrome" (расширение в [Google Webstore])
+ * Добавлена поддержка расширения в `rpc.php`
+ * Незначительные поправки и доработки
 
 0.0.14
 ----------
@@ -60,6 +64,7 @@
 
  * Релиз на гитхабе
 
+[Google Webstore]:https://chrome.google.com/webstore/detail/wget-gui-light/dbcjcjjjijkgihaddcmppppjohbpcail
 [Pull #11]:https://github.com/tarampampam/wget-gui-light/pull/11
 [Issue #8]:https://github.com/tarampampam/wget-gui-light/issues/8
 [tarampampam]:https://github.com/tarampampam

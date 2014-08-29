@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Wget GUI Light</title>
+        <style type="text/css">
+            html,body,div,span,h1,h2,h3,h4,h5,h6,p,blockquote,a,img,small,sub,b,dl,dd,dt,ul,li,
+            label,article,details,footer,header,menu,nav,input,textarea,select {
+                font-family: Georgia, Times, 'Times new roman';
+                color: #333;
+                background: transparent;
+                border: 0;
+                outline: 0;
+                padding: 0;
+                margin: 0;
+            }
+            body {
+                background-color: #dfdfdf;
+            }
+            div.settings {
+                border: solid 1px #a3a3a3;
+                position: absolute;
+                left: 50%; top: 50%;
+                background-color: #fff;
+                height: 200px; margin-top: -120px;
+                width: 500px; margin-left: -270px;
+                padding: 20px;
+                -webkit-box-shadow: 0 10px 6px -6px #777;
+                   -moz-box-shadow: 0 10px 6px -6px #777;
+                        box-shadow: 0 10px 6px -6px #777;
+            }
+                div.settings h1 {
+                    text-align: center;
+                    padding: 0 0 30px 0;
+                    font-size: 26px;
+                    font-weight: bold;
+                }
+                div.settings h3 {
+                    text-align: center;
+                    padding: 0 0 10px 0;
+                    font-size: 16px;
+                    font-weight: normal;
+                }
+                div.settings div.pathToRpc {
+                    padding: 0;
+                }
+                    div.settings div.pathToRpc input[type='text'] {
+                        display: block;
+                        border: solid 1px #a3a3a3;
+                        padding: 6px;
+                        width: 90%;
+                        margin: 0 auto;
+                        transition: all .2s ease;
+                    }
+                div.settings #noty {
+                    text-align: center;
+                    color: #888;
+                    padding: 20px 0;
+                }
+                div.settings div.save {
+                    padding: 20px 0;
+                    position: absolute;
+                    width: 100%;
+                    bottom: 0;
+                    left: 0px;
+                }
+                    div.settings input[type='button'] {
+                        display: block;
+                        margin: 0 auto;
+                        cursor:pointer;
+                        padding:5px 25px; 
+                        background:#4285f4;
+                        border:1px solid #3972d1;
+                        border-radius: 10px;
+                        box-shadow: 0 0 4px rgba(0,0,0, .75);
+                        color:#f3f3f3;
+                        font-size:1.1em;
+                        transition: all .2s ease;
+                    }
+
+                    div.settings input[type='button']:hover, div.settings input[type='button']:focus{
+                        background-color :#3c7adf;
+                        box-shadow: 0 0 1px rgba(0,0,0, .75);
+                    }
+                    
+                    
+                    
+        </style>
+    </head>
+<body>
+    <div class="settings">
+        <h1>Wget GUI Light &mdash; Settings</h1>
+        <h3>URL to "Wget GUI Light" <small>(with '/' or '/rpc.php' at the end)</small>:</h3>
+        <div class="pathToRpc">
+            <input type="text" id="pathToRpc" placeholder="http://someurl.ltd/wget-gui/" />
+        </div>
+        <div id="noty"></div>
+        <div class="save">
+            <input type="button" id="saveSettings" value="Save settings" />
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

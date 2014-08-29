@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   Search in 'version.js'
+## @version   Look in 'version.js'
 ##
 ## @depends   *nix, php5, wget, bash, ps, kill, rm
 
@@ -16,6 +16,7 @@
 
 ## Add debug info to log and output. Comment this line or set 'false' for 
 ##   disable this feature
+#define('DebugMode', false);
 define('DebugMode', false);
 
 ## Settings paths
@@ -25,7 +26,8 @@ define('BASEPATH', realpath(dirname(__FILE__)));
 ##   Path to downloads directory. Any files will download to this path 
 ##     (without '/' at the end).
 ##     CHANGE DEFAULT PATH
-define('download_path', BASEPATH.'/downloads');
+#define('download_path', BASEPATH.'/downloads');
+define('download_path', '/DataVolume/shares/Public/Downloads/wget');
 
 ##   Path to temp files directory. Temp files will created by 'wget' for 
 ##     getting progress in background job, and will be deleted automatically
@@ -71,6 +73,7 @@ define('wget_secret_flag', '--max-redirect=4321');
 # *****************************************************************************
 
 header('Content-Type: application/json; charset=UTF-8'); // Default header
+header('Access-Control-Allow-Origin: *'); // For request from anywhere
 
 if(defined('DebugMode') && DebugMode) {
     error_reporting(-1); ini_set('display_errors', 'On');
@@ -129,7 +132,7 @@ class log {
 	}
 	
     private static function checkPermissions() {
-        return (!file_exists(log_path) || !is_dir(log_path) || !is_writable(log_path)) ? false : true;
+        return (file_exists(log_path) && is_dir(log_path) && is_writable(log_path)) ? true : false;
     }
     
 	private static function writeLog($logName, $msg = '') {
@@ -281,7 +284,7 @@ function removeWgetTask($pid) {
 // Add task for a work
 function addWgetTask($url, $saveAs) {
     function checkPermissions() {
-        return (!file_exists(download_path) || !is_dir(download_path) || !is_writable(download_path)) ? false : true;
+        return (file_exists(download_path) && is_dir(download_path) && is_writable(download_path)) ? true : false;
     }
     
     log::debug('(call) addWgetTask() called, $url='.var_export($url, true).', $saveAs='.var_export($saveAs, true));
@@ -298,16 +301,16 @@ function addWgetTask($url, $saveAs) {
         );
     }
 
-    if(checkPermissions()) {
+    if(!checkPermissions()) {
         mkdir(download_path, 0777, true); chmod(download_path, 0777); // First attempt to create path - by php
-        if(checkPermissions()) {
+        if(!checkPermissions()) {
             bash('mkdir -p "'.download_path.'"; chmod 0777 "'.download_path.'/"'); // Second - by shell
-            if(checkPermissions()) { // Finally check
+            if(!checkPermissions()) { // Finally check
                 log::error('Directory '.var_export(download_path, true).' cannot be created');
-	        return array(
-	            'result' => false,
-	            'msg' => 'Cannot create directory for downloads'
-	        );
+                return array(
+                    'result' => false,
+                    'msg' => 'Cannot create directory for downloads'
+                );
             }
         }
     }

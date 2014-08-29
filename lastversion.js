@@ -1,8 +1,8 @@
 var web_wgetguilight = {
-    "version": "0.0.14",
+    "version": "0.0.15",
     "name": "Wget GUI light",
     "lastUpdate": {
-        "shortDesc": "Added checking for existing and writable download directory, small fixes",
+        "shortDesc": "Added Google Chrome extension, added extensions support, small fixes",
         "fullDescUrl": "https://github.com/tarampampam/wget-gui-light/blob/master/cahngeslog.md"
     },
     "download": {

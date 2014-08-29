@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png) &nbsp; ![license MIT](http://gitshields.com/v2/text/os/linux/orange.png) &nbsp; ![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png) &nbsp; ![version](http://gitshields.com/v2/text/version/0.0.14/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png) &nbsp; ![license MIT](http://gitshields.com/v2/text/os/linux/orange.png) &nbsp; ![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png) &nbsp; ![version](http://gitshields.com/v2/text/version/0.0.15/lightgrey.png)
 
 Web-интерфейс для [wget] - программы загрузки файлов по сети. Построен на Ajax+css3 с клиентской стороны, и **php** с серверной. Требования к системе, на которой разворачивается данное решение:
 
@@ -134,6 +134,13 @@ Answer:
 
 ### [История изменений]
 
+#### [Расширения для браузеров]:
+
+ * [Wget GUI Light - Google chrome Extension]
+ * Firefox (в планах)
+ * Opera (в планах)
+
+
 #### [Пост на хабре]
 
 В случае возникновения ошибок — [задайте вопрос].
@@ -156,6 +163,8 @@ Copyright © 2014 Samoylov Nikolay
  * Плагин для работы с плюшками [jquery.cookie.js]
  * Попап-плагин [bpopup]
 
+[Расширения для браузеров]:https://github.com/tarampampam/wget-gui-light/tree/master/browser-extension
+[Wget GUI Light - Google chrome Extension]:https://chrome.google.com/webstore/detail/wget-gui-light/dbcjcjjjijkgihaddcmppppjohbpcail
 [Пост на хабре]:http://habrahabr.ru/post/234353/
 [wget]:https://ru.wikipedia.org/wiki/Wget
 [Установка / обновление]:https://github.com/tarampampam/wget-gui-light/blob/master/HowUpdate.md

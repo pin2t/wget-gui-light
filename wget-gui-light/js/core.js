@@ -4,7 +4,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   Search in 'version.js'
+## @version   Look in 'version.js'
 
 ## 3rd party used tools:
 ##   * jquery           <http://jquery.com/>
