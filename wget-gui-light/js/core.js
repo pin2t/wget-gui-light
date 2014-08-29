@@ -39,6 +39,9 @@ $(function() {
         /* Enable checking for newest versions */
         CheckForUpdates = true,
         
+        /* Check - installed extension for browser, or not? */
+        CheckExtensionInstalled = true,
+        
         /* IMPORTANT! Path for AJAX requests */
         prc = 'rpc.php';
 
@@ -637,6 +640,41 @@ $(function() {
                 });
             } catch(e) {console.log('Error on checking update : ' + e)}// TODO: Comment while testing
             
+        }
+    }
+    
+    /* *** Browser extension ********************************************************* */
+    
+    function chromeCheckExtensionInstalled(callback) {
+        body.append('<img alt="" id="extensionImg" style="display:none" />');
+        var extensionImg = $('#extensionImg');
+        extensionImg
+            .one('load',  function(){if($.isFunction(callback))callback(true);  extensionImg.remove()})
+            .one('error', function(){if($.isFunction(callback))callback(false); extensionImg.remove()})
+            .attr('src', 'chrome-extension://dbcjcjjjijkgihaddcmppppjohbpcail/img/icon.png');
+    }
+    
+    if(CheckExtensionInstalled) {
+        body.append('<div id="browserExtension" class="hidden">Browser Extension</div>');
+        
+        var addExtension = $('#browserExtension'),
+            isBrowser = (/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) ? 'chrome' : '';
+            
+        if(isBrowser === 'chrome') {
+            chromeCheckExtensionInstalled(function(installed){
+                if(installed) {
+                    addExtension.remove();
+                } else {
+                    addExtension
+                        .css({ opacity: '0', display: 'block' })
+                        .addClass('chrome')
+                        .on('click', function(){
+                            window.open('https://chrome.google.com/webstore/detail/dbcjcjjjijkgihaddcmppppjohbpcail');
+                            return false;
+                        })
+                        .animate({ opacity: 0.3 }, 500);
+                }
+            });
         }
     }
     
