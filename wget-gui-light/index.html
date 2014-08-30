@@ -1,18 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    
     <title>Download File</title>
-    
     <link rel="icon" type="image/png" id="favicon" href="img/favicon.png" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/progressbar.css" />
     <link rel="stylesheet" type="text/css" href="css/notifIt.css" />
 </head>
 <body>
+    <div id="menu-button" class="close"><span>Close</span></div>
+    <div id="menu" class="close">
+        <ul>
+            <li><a id="bookmark" href="#" title="Move me to your bookmarks bar">Bookmark "Download"</a></li>
+        </ul>
+        <div id="historyList">
+            <h2>Recent tasks:</h2>
+            <ul></ul>
+        </div>
+        <div class="bottom">
+            Wget GUI Light v<span class="projectCurrentVersion">...</span>
+        </div>
+    </div>
+    
     <div id="urlbar">
         <div class="title">Download file:</div>
         <div id="inputData">
@@ -30,11 +43,9 @@
 
     <div id="tasklist"></div>
     
-    <div id="footer">Wget GUI Light <span class="button"><a id="bookmark" href="#" title="Move me to your bookmarks bar">Bookmark</a></span></div>
-    
     <script type="text/javascript" src="version.js"></script>
     <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.min.js"></script>
     <script type="text/javascript" src="js/url.js"></script>
     <script type="text/javascript" src="js/notifIt.js"></script>
     <script type="text/javascript" src="js/core.js"></script>

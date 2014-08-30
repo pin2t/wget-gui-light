@@ -22,6 +22,8 @@ $(function() {
         favicon = $('#favicon'),
         taskInput = $('#addTaskAddr'),
         taskButton = $('#addTaskBtn'),
+        menu = $('#menu'),
+        menuButton = $('#menu-button'),
         pageTitle = $(document).find('title'),
         titleText = pageTitle.text(),
         timerHandler = null,
@@ -67,6 +69,15 @@ $(function() {
     
     function clearString(str) {
         return str.replace(/<\/?[^>]+(>|$)/g, "");
+    }
+    
+    function getLabelTextFromUrl(inputUrl) {
+        var url       = new URL(inputUrl), /* parse url */
+            urlPath   = (!url.data.path) ? url.url : url.data.path, /* extract path from url */
+            filename  = (urlPath.indexOf('/') > 1) ? urlPath.split("/").pop() : urlPath, /* extract filename from path */
+            labelFilename = (!url.data.path || 0 === url.data.path.length) ? '' : url.data.path, /* set filename for label */
+            labelText = (!filename || 0 === filename.length) ? url.data.host+'/'+labelFilename : filename; /* set text label for task */
+        return labelText;
     }
     
     /* *** TASKS FUNCTIONS *********************************************************** */
@@ -159,6 +170,35 @@ $(function() {
                 }
         });
         return false;
+    }
+    
+    function getHistoryList(callback) {
+        if(DebugMode) console.info('getHistoryList() called');
+        var historyList = [],
+            result = [];
+        
+        $.getJSON(prc, {'action': 'get_history'})
+            .done(function(answerJSON) {
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
+                if($.isArray(answerJSON.history) && (answerJSON.history.length > 0) && (answerJSON.status == '1')) {
+                    jQuery.each(answerJSON.history, function() {
+                        if((typeof this.url !== 'undefined') && (typeof this.success !== 'undefined'))
+                            result.push(this);
+                    });
+                    if ($.isFunction(callback)) callback(result);
+                    return result;
+                } else {
+                    if ($.isFunction(callback)) callback([]);
+                    return [];
+                }
+            })
+            .fail(function(answerJSON) {
+                if(DebugMode) console.log('AJAX result: ', answerJSON);
+                notif({type: "error", position: "center", msg: 'Get tasks list &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                if ($.isFunction(callback)) callback(result);
+                return result;
+            });
+        return result;
     }
     
     function testServer() {
@@ -377,6 +417,30 @@ $(function() {
                 'AddedTasksIDs: '+AddedTasksIDs
             );
             
+            // Init history list
+            getHistoryList(function(list){
+                var historyDiv = $('#historyList');
+                
+                if(list.length > 0) {
+                    var historyList = historyDiv.find('ul').first(),
+                        firstShow = (historyList.find('li').length == 0) ? true : false;
+                        
+                    if(firstShow) historyDiv.css({ opacity: 0 });
+                    
+                    historyDiv.show().css({ display: 'block' });
+                    historyList.empty();
+                    for(var i = 0; i < list.length; ++i) {
+                        var cssClass = (list[i].success === true) ? 'ok' : 'err';
+                        var hrefTitle = (list[i].success === true) ? '' : 'Task completed with error';
+                        historyList.append('<li><a href="'+list[i].url+'" title="'+hrefTitle+'" class="'+cssClass+'">'+getLabelTextFromUrl(list[i].url)+'</li>');
+                    }
+                    
+                    if(firstShow) historyDiv.animate({ opacity: 1 });
+                } else {
+                    historyDiv.fadeOut();
+                }
+            });
+            
             if((typeof updateStatusInterval === 'number') && updateStatusInterval > 0) {
                 window.clearTimeout(timerHandler);
                 timerHandler = setTimeout(function(){ return syncTasksList() }, updateStatusInterval);
@@ -446,15 +510,12 @@ $(function() {
     
     function addTaskGui(data) {
         /* data = {'url': 'http://foo.com/bar.dat, 'progress': 50, 'id': 12345} */
-        var url       = new URL(data.url), /* parse url */
-            urlPath   = (!url.data.path) ? url.url : url.data.path, /* extract path from url */
-            filename  = (urlPath.indexOf('/') > 1) ? urlPath.split("/").pop() : urlPath, /* extract filename from path */
-            labelFilename = (!url.data.path || 0 === url.data.path.length) ? '' : url.data.path, /* set filename for label */
-            labelText = (!filename || 0 === filename.length) ? url.data.host+'/'+labelFilename : filename, /* set text label for task */
-            taskID    = data.id, /* set task ID */
+        var url    = data.url,
+            labelText = getLabelTextFromUrl(url),
+            taskID = data.id, /* set task ID */
             html = '<div class="task id'+taskID+'">'+
                        '<table><tr>'+
-                       '<td class="name"><a href="'+url.url+'" title="'+labelText+'" target="_blank">'+labelText+'</a></td>'+
+                       '<td class="name"><a href="'+url+'" title="'+labelText+'" target="_blank">'+labelText+'</a></td>'+
                        '<td class="progress"><div class="meter animate"><span style="width: 0%"><span></span></span></div></td>'+
                        '<td class="actions"><input type="button" class="button cancel red-hover" value="Cancel" /></td>'+
                        '</td></table>'+
@@ -464,7 +525,7 @@ $(function() {
         taskObj
             .css({opacity: 0})
             .data('info', {
-                url: url.url,
+                url: url,
                 id: taskID
             })
             .find('input.cancel').on('click', function(){
@@ -542,6 +603,22 @@ $(function() {
             $('#taskExtended .multitask').animate({ opacity: 0 }, 200);
         });
     
+    // Enable menu events
+    menuButton
+        .on('click', function() {
+            if(!menu.hasClass('open')) {
+                menu.removeClass('close').addClass('open');
+                menuButton.removeClass('close').addClass('open');
+            } else {
+                menu.removeClass('open').addClass('close');
+                menuButton.removeClass('open').addClass('close');
+            }
+            return false;
+        });
+    
+    // Print version to any gui element with class 'projectCurrentVersion'
+    if(wgetGuiCurrentVersion !== false) $('.projectCurrentVersion').text(wgetGuiCurrentVersion);
+    
     // Enable feature 'Quick download bookmark'
     if(($.urlParam('action') == 'add')){
         var url = $.urlParam('url');
@@ -553,6 +630,38 @@ $(function() {
             notif({msg: "Move me to your <b>bookmarks bar</b>, don't click here :)", position: "center", time: 5000, opacity: 0.8});
             return false;
         });
+    
+    /* *** Browser extension ********************************************************* */
+    
+    function chromeCheckExtensionInstalled(callback) {
+        body.append('<img alt="" id="extensionImg" style="display:none" />');
+        var extensionImg = $('#extensionImg');
+        extensionImg
+            .one('load',  function(){if($.isFunction(callback))callback(true);  extensionImg.remove()})
+            .one('error', function(){if($.isFunction(callback))callback(false); extensionImg.remove()})
+            .attr('src', 'chrome-extension://dbcjcjjjijkgihaddcmppppjohbpcail/img/icon.png');
+    }
+    
+    if(CheckExtensionInstalled) {
+        var isBrowser = (/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) ? 'chrome' : '';
+            
+        if(isBrowser === 'chrome') {
+            chromeCheckExtensionInstalled(function(installed){
+                if(!installed) {
+                    menu.find('ul').first().append('<li><a href="#" id="browserExtension" style="display:none;">Install Google Chrome Extension</a></li>');
+                    var addExtension = $('#browserExtension');
+                    
+                    addExtension
+                        .show()
+                        .addClass('chrome')
+                        .on('click', function(){
+                            window.open('https://chrome.google.com/webstore/detail/dbcjcjjjijkgihaddcmppppjohbpcail');
+                            return false;
+                        });
+                }
+            });
+        }
+    }
     
     /* *** Need Update Notification ************************************************** */
     
@@ -580,7 +689,7 @@ $(function() {
                         // If web version is newest then local
                         if(versionCompare(wgetGuiCurrentVersion, web_wgetguilight.version) < 0) {
                             var webVer = web_wgetguilight;
-                            $('#footer').append('<a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank"style="white-space:nowrap;text-overflow:clip;overflow:hidden">Update available</a>');//
+                            menu.find('.bottom').last().append('<br /><a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank" style="white-space:nowrap; text-overflow:clip; overflow:hidden; font-size:80%; font-family:Tahoma,Verdana,Arial; opacity:1;">Update available</a>');//
                             var updateLink = $('#updateAvailable'), 
                                 updateLinkOrigWidth = updateLink.width();
                             // Animate showing notification link
@@ -602,8 +711,8 @@ $(function() {
                                                 '<h3 class="availablever">Available version: <strong>'+webVer.version+'</strong></h3>'+
                                                 '<p class="desc">'+webVer.lastUpdate.shortDesc+' // <a href="'+webVer.lastUpdate.fullDescUrl+'" target="_blank">Full text</a></p>'+
                                                 '<div class="links">'+
-                                                    '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="http://oi58.tinypic.com/2jbv9c7.jpg" width="64" height="64" /><br />Info page</a>'+
-                                                    '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="http://oi62.tinypic.com/2zi36on.jpg" width="64" height="64" /><br />Package</a>'+
+                                                    '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="img/dl-watch-detalies.svg" width="64" height="64" /><br />Info page</a>'+
+                                                    '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="img/dl-package.svg" width="64" height="64" /><br />Package</a>'+
                                                     '<div class="clear"></a>'+
                                                 '</div>'+
                                                 '<p class="disable">'+
@@ -640,41 +749,6 @@ $(function() {
                 });
             } catch(e) {console.log('Error on checking update : ' + e)}// TODO: Comment while testing
             
-        }
-    }
-    
-    /* *** Browser extension ********************************************************* */
-    
-    function chromeCheckExtensionInstalled(callback) {
-        body.append('<img alt="" id="extensionImg" style="display:none" />');
-        var extensionImg = $('#extensionImg');
-        extensionImg
-            .one('load',  function(){if($.isFunction(callback))callback(true);  extensionImg.remove()})
-            .one('error', function(){if($.isFunction(callback))callback(false); extensionImg.remove()})
-            .attr('src', 'chrome-extension://dbcjcjjjijkgihaddcmppppjohbpcail/img/icon.png');
-    }
-    
-    if(CheckExtensionInstalled) {
-        body.append('<div id="browserExtension" class="hidden">Browser Extension</div>');
-        
-        var addExtension = $('#browserExtension'),
-            isBrowser = (/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) ? 'chrome' : '';
-            
-        if(isBrowser === 'chrome') {
-            chromeCheckExtensionInstalled(function(installed){
-                if(installed) {
-                    addExtension.remove();
-                } else {
-                    addExtension
-                        .css({ opacity: '0', display: 'block' })
-                        .addClass('chrome')
-                        .on('click', function(){
-                            window.open('https://chrome.google.com/webstore/detail/dbcjcjjjijkgihaddcmppppjohbpcail');
-                            return false;
-                        })
-                        .animate({ opacity: 0.3 }, 500);
-                }
-            });
         }
     }
     

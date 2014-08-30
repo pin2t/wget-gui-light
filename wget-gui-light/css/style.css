@@ -39,6 +39,86 @@ html,body {
 
 /* ----------------------------------------------------------------------------------- */
 
+#menu-button {
+    position: fixed;
+    font-size: 50px; font-family: verdana !important;
+    font-weight: normal !important; font-style: normal !important;
+    height: 50px; width: 50px;
+    left: 13px; top: 10px;
+    color: #ccc;
+    cursor: pointer;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    z-index: 11;
+}
+    #menu-button span {
+        display: block; font-size: 20px;
+        color: #fff; opacity: .7;
+        margin: 11px 0 0 45px;
+    }
+    #menu-button:after {
+        content: '\2261'; color:#ccc;
+        position: absolute;
+        top:0.39em; left:0.036em; line-height: 0;
+    }
+    #menu-button:active {
+        left: 14px; top: 11px;
+    }
+#menu-button.open { display: block }
+#menu-button.close span {display: none }
+
+#menu {
+    position: fixed;
+    left: 0;
+    height: 100%; width: 200px;
+    padding: 60px 30px 20px 20px;
+    background: #444;
+	-moz-transition: all 300ms;
+	-webkit-transition: all 300ms;
+	transition: all 300ms;
+    overflow: hidden;
+    z-index: 10;
+    transition: all 0.1s linear;
+    box-shadow: 6px 0px 22px 0px rgba(0, 0, 0, 0.22);
+}
+    #menu * { /* default fonts */
+        color: #fff;
+        text-decoration: none;
+    }
+        #menu ul li {
+            padding: 10px 0;
+            border: solid #555;
+            border-width: 0 0 1px 0;
+        }
+        #menu ul li:last-child, #menu ul li.last {
+            border-width: 0;
+        }
+    #menu a:hover {
+        text-decoration: underline;
+    }
+    #menu h1, #menu h2, #menu h3, #menu h4, #menu h5, #menu h6 {
+        font-family: Georgia, Times, 'Times new roman';
+        font-weight: normal;
+        letter-spacing: 0.05em;
+        padding: 20px 0 5px 0;
+    }
+    #historyList {display: none}
+    #historyList ul li a.ok {}
+    #historyList ul li a.err {
+        color: #ffd8d8;
+    }
+    #menu .bottom {
+        position: absolute; bottom: 0;
+        margin-bottom: 100px; width: 200px;
+        text-align: center;
+        font-family: Georgia, Times, 'Times new roman';
+    }
+#menu.open  { left: 0;      box-shadow: 6px 0px 22px 0px rgba(0, 0, 0, 0.22); }
+#menu.close { left: -250px; box-shadow: none; }
+
+/* ----------------------------------------------------------------------------------- */
+
 #urlbar {
     background-color: #fff;
     width: 90%;
@@ -248,103 +328,13 @@ html,body {
                 border-color: #afa;
                 color: #fff;
             }
-            
+
 
 /* ----------------------------------------------------------------------------------- */
+/* ext */
 
-#footer {
-    position: fixed;
-    text-align: center;
-    bottom:0; width: 100%;
-    
-    background-color: #eee;
-    font-family: Tahoma, Arial, Verdana;
-    font-size: 12px;
-    color: #aaa;
-    
-    padding: 5px 0;
-}
-    #footer a {
-        color: #777;
-        /*font-weight: bold;*/
-        text-decoration: none;
-        transition: all .3s ease;
-        position: relative;
-        top: 2px;
-    }
-        #footer a:hover {
-            color: #111;
-        }
-    
-    #footer .button {
-        background-color: #bbb;
-        padding: 1px 8px;
-        margin: 0 6px;
-        border-radius: 15px;
-        text-decoration: none;
-        transition: all .1s linear;
-    }
-        #footer .button > * {
-            text-decoration: none;
-            color: #fff;
-            text-shadow: 0px 1px 2px rgba(130, 130, 130, 1);
-            position: relative;
-            top: 0;
-        }
-        #footer .button > a:hover {
-            color: #fff;
-        }
-        #footer .button:hover {
-            margin: 0 12px;
-        }
-
-/* ----------------------------------------------------------------------------------- */
-
-#browserExtension {
-    display: none; /* set 'block' while develop */
-    background-color: #333;
-    width: 60px;
-    padding: 70px 70px 3px 70px;
-    vertical-align: bottom;
-    text-align: center;
-    transform: rotate(315deg);
-    
-    color: #fff;
-    font-size: 9px;
-    text-decoration: none;
-    
-    position: absolute;
-    top: -55px;
-    left: -110px;
-    
-    cursor: pointer;
-    transition: all .2s ease-in-out;
-    box-shadow: 0px 2px 5px 0px rgba(50, 50, 50, 0.4);
-    opacity: .2;
-}
-    #browserExtension:hover {
-        top: -42px;
-        left: -95px;
-        font-size: 12px;
-        opacity: 1 !important;
-    }
-        #browserExtension.chrome:hover {
-            background-color: #cf8638;
-        }
-        #browserExtension.firefox:hover {
-            background-color: #f19a2a;
-        }
-        #browserExtension.ie:hover {
-            background-color: #00caff;
-        }
-        #browserExtension.safari:hover {
-            background-color: #00a0e6;
-        }
-        #browserExtension.opera:hover {
-            background-color: #f25648;
-        }
-
-
+#browserExtension.chrome:hover {}
+#browserExtension.firefox:hover {}
 
 /* ----------------------------------------------------------------------------------- */
    
@@ -411,9 +401,5 @@ body.active-tasks #tasklist {
     }
     #tasklist .task table .actions *:first-child {
         margin-left: 0;
-    }
-    
-    #footer {
-        font-size: 10px;
     }
 }
