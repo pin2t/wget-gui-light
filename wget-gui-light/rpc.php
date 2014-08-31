@@ -89,24 +89,24 @@ if(!defined('rm'))   define('rm', 'rm');
 class log {
     const ErrorsLog  = 'wgetgui.log';
     const WarningLog = 'wgetgui.log';
-	const NoticesLog = 'wgetgui.log';
-	const DebugLog   = 'wgetgui.log';
+    const NoticesLog = 'wgetgui.log';
+    const DebugLog   = 'wgetgui.log';
     ## --- Or you can set ---
-	#const NoticesLog = 'wgetgui-notices.log';
-	#const WarningLog = 'wgetgui-warnings.log';
-	#const ErrorsLog  = 'wgetgui-errors.log';
-	#const DebugLog   = 'wgetgui-debug.log';
-	
-	private static function getTimeStamp() {
+    #const NoticesLog = 'wgetgui-notices.log';
+    #const WarningLog = 'wgetgui-warnings.log';
+    #const ErrorsLog  = 'wgetgui-errors.log';
+    #const DebugLog   = 'wgetgui-debug.log';
+    
+    private static function getTimeStamp() {
         list($usec, $sec) = explode(' ', microtime());
-		return '['.date('Y/m/d H:i:s.', $sec) . substr($usec, 2, 3).']';
-	}
-	
+        return '['.date('Y/m/d H:i:s.', $sec) . substr($usec, 2, 3).']';
+    }
+    
     private static function checkPermissions() {
         return (file_exists(log_path) && is_dir(log_path) && is_writable(log_path)) ? true : false;
     }
     
-	private static function writeLog($logName, $msg = '') {
+    private static function writeLog($logName, $msg = '') {
 
         if(!defined('log_path')) return false;
         
@@ -128,29 +128,29 @@ class log {
                 fclose($logFile);
         
         return true;
-	}
+    }
 
-	public static function error($msg) {
-		return self::writeLog(self::ErrorsLog,  self::getTimeStamp().' (ERROR) '.$msg);
-	}
+    public static function error($msg) {
+        return self::writeLog(self::ErrorsLog,  self::getTimeStamp().' (ERROR) '.$msg);
+    }
     
-	public static function warning($msg) {
-		return self::writeLog(self::WarningLog, self::getTimeStamp().' (warning) '.$msg);
-	}
+    public static function warning($msg) {
+        return self::writeLog(self::WarningLog, self::getTimeStamp().' (warning) '.$msg);
+    }
     
-	public static function notice($msg) {
-		return self::writeLog(self::NoticesLog, self::getTimeStamp().' (notice) '.$msg);
-	}
+    public static function notice($msg) {
+        return self::writeLog(self::NoticesLog, self::getTimeStamp().' (notice) '.$msg);
+    }
     
-	public static function debug($msg) {
+    public static function debug($msg) {
         if(defined('DebugMode') && DebugMode)
             return self::writeLog(self::DebugLog, self::getTimeStamp().' (debug) '.$msg);
         else return false;
-	}
+    }
     
-	public static function emptyLine() {
+    public static function emptyLine() {
         return self::writeLog(self::DebugLog, '');
-	}
+    }
 }
 
 /**
@@ -288,7 +288,6 @@ function getWgetTasks() {
     }
     return $result;
 }
-//print_r(getWgetTasks()); // Debug call
 
 /**
  * Remove download task. Kill process & remove temp log file
@@ -318,13 +317,15 @@ function removeWgetTask($pid) {
     
     $kill = @posix_kill((int) $taskData['pid'], 15); // http://php.net/manual/ru/function.posix-kill.php
     if(!$kill) log::error('Task with PID '.$taskData['pid'].' NOT killed');
+    
+    usleep(200000); // at first - subprocess must del file. if not - when del we // 2/10 sec
     if (!empty($taskData['logfile']) && file_exists($taskData['logfile'])) {
         log::notice('removeWgetTask() remove file '.var_export($taskData['logfile'], true));
         $del = @unlink($taskData['logfile']); // http://php.net//manual/ru/function.unlink.php
         if(!$del) log::error('File '.var_export($taskData['logfile'], true).' NOT deleted');
     }
     
-    if(!is_null($taskData['pid']) && $kill && $del) {
+    if(!is_null($taskData['pid']) && $kill) {
         log::notice('Task with ID '.var_export($taskData['pid'], true).' killed');
         return array(
             'result' => true,
@@ -419,7 +420,7 @@ function addWgetTask($url, $saveAs) {
     
     usleep(100000); // 1/10 sec
     
-    preg_match("/(\d{1,5})/i", $task, $founded);
+    preg_match("/(\d{2,5})/i", $task, $founded);
     $parentPid = @$founded[1];
     if(!validatePid($parentPid)) {
         log::error('Parent PID '.var_export($parentPid, true).' for task '.var_export($url, true).' not valid');
@@ -445,10 +446,10 @@ function addWgetTask($url, $saveAs) {
     }
     
     if(!file_exists($tmpFileName)) {
-        log::notice('Task '.var_export($url, true).' already complete');
+        log::notice('Task '.var_export($url, true).' already complete (probably with error)');
         return array(
             'result' => true,
-            'msg' => 'Task completed too fast (or with error)'
+            'msg' => 'Task completed too fast (probably with error)'
         );
     }
     
@@ -467,7 +468,6 @@ function addWgetTask($url, $saveAs) {
         'msg' => 'Task added successful'
     );
 }
-//echo addWgetTask('http://goo.gl/v7Ujhg'); // Debug call
 
 /**
  * Get history
@@ -564,8 +564,13 @@ if(!empty($_GET['action'])) {
     // Set value from GET array to $formData
     $formData = array(
         'action' => preg_replace("/[^a-z_]/", "", strtolower(@$_GET['action'])),
-        'url'    => str_replace(array("'", "\"", "\\", "|", "`", "<", ">", "\n", "\r", "\t"), '', @$_GET['url']),
-        'saveAs' => str_replace(array("'", "\"", "\\", "/", "*", "|", "`", "<", ">", "?", ":", "\n", "\r", "\t"), '', @$_GET['saveAs']),
+        'url'    => str_replace( // http://tools.ietf.org/html/rfc1738
+            // encode url string, and make "back-encode" some important for wget chars
+            array('%2F', '%3A', '%40', '%3F', '%3D', '%26'),
+            array('/',   ':',   '@',   '?',   '=',   '&'),
+            rawurlencode(@$_GET['url'])
+        ),
+        'saveAs' => str_replace(array("'", "\"", "\\", "/", "*", "$", "|", "`", "<", ">", "?", ":", "\n", "\r", "\t", "\0"), '', @$_GET['saveAs']),
         'id'     => preg_replace("/[^0-9]/", "", @$_GET['id'])
     );
     
