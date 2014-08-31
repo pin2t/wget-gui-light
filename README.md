@@ -172,8 +172,4 @@ DebugMode | Включается режим отладки (добавляет �
 [url.js]:http://habrahabr.ru/post/232073/
 [CSS3 progress bar]:http://css-tricks.com/css3-progress-bars/
 [jquery.cookie.js]:https://github.com/carhartl/jquery-cookie
-<<<<<<< HEAD
 [bPopup]:http://dinbror.dk/bpopup/
-=======
-[bPopup]:http://dinbror.dk/bpopup/
->>>>>>> origin/master
