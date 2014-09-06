@@ -7,9 +7,9 @@
 ## @version   Look in 'version.js'
 
 ## 3rd party used tools:
-##   * jquery           <http://jquery.com/>
+##   * jquery           <https://github.com/jquery/jquery>
 ##   * notifIt!         <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
-##   * url.js           <http://habrahabr.ru/post/232073/>
+##   * url.js           <https://github.com/websanova/js-url>
 ##   * jquery.cookie.js <https://github.com/carhartl/jquery-cookie>
 ##   * bpopup           <http://dinbror.dk/bpopup/>
 */
@@ -61,6 +61,10 @@ $(function() {
             }, 1200);
     });
     
+    if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        taskInput.height(20); // Fix Firefox auto-height bug
+    }
+    
     /* *** EXT FUNCTIONS ************************************************************* */
     
     function getRandomInt(min, max) {
@@ -72,11 +76,17 @@ $(function() {
     }
     
     function getLabelTextFromUrl(inputUrl) {
-        var url       = new URL(inputUrl), /* parse url */
-            urlPath   = (!url.data.path) ? url.url : url.data.path, /* extract path from url */
-            filename  = (urlPath.indexOf('/') > 1) ? urlPath.split("/").pop() : urlPath, /* extract filename from path */
-            labelFilename = (!url.data.path || 0 === url.data.path.length) ? '' : url.data.path, /* set filename for label */
-            labelText = (!filename || 0 === filename.length) ? url.data.host+'/'+labelFilename : filename; /* set text label for task */
+        // use code from url(.min).js
+        var domain = $.url('domain', inputUrl),
+            path = $.url('path', inputUrl),
+            file = $.url('file', inputUrl),
+            
+            labelText = '',
+            labelText = (domain || domain.length !== 0) ? domain : labelText,
+            labelText = (path || path.length !== 0) ? path : labelText,
+            labelText = (file || file.length !== 0) ? file : labelText,
+            labelText = (labelText == '') ? inputUrl : labelText;
+        //console.log(domain, path, file);
         return labelText;
     }
     
@@ -243,12 +253,14 @@ $(function() {
             return false;
         }
         
-        // Catt 'test' mode
+        // Call 'test' mode
         if(fileUrl === 'test') {
             testServer(); return false;
         }
         
-        var urls = fileUrl.split(/\r*\n/),
+        // If 'fileUrl' without '(http|https|ftp)://' at the begin - we add 'http://'
+        var fileUrl = (fileUrl.substring(3, 8).indexOf('://') == -1) ? 'http://'+fileUrl : fileUrl,
+            urls = fileUrl.split(/\r*\n/),
             brokenUrls = [], validUrls = [];
 
 
@@ -295,7 +307,7 @@ $(function() {
                         // and returned 'id' (pid) is correct
                         if((typeof result.id === 'number') && (result.id > 1)) {
                             // Add task to gui
-                            addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id});
+                            addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id, 'name': result.saveAs});
                         } else
                             // or only show message
                             notif({type: "warning", multiline: true, time: 10000, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
@@ -372,6 +384,7 @@ $(function() {
                     if((typeof wgetTask !== 'undefined') && (typeof guiTaskData !== 'undefined') && (wgetTask.id == guiTaskData.id)) {
                         // Make data sync
                         setTaskProgress(guiTaskData.id, wgetTask.progress);
+                        setTaskLabelText(guiTaskData.id, wgetTask.saveAs);
                         // +Get SyncedTasksIDs
                         SyncedTasksIDs.push(wgetTask.id);
                     }
@@ -403,7 +416,7 @@ $(function() {
             for(var i = 0; i < AddedTasksIDs.length; ++i) 
                 for(var j = 0; j < Tasks.length; ++j) 
                     if(Tasks[j].id == AddedTasksIDs[i]) 
-                        addTaskGui({'url': Tasks[j].url, 'progress': Tasks[j].progress, 'id': Tasks[j].id});
+                        addTaskGui({'url': Tasks[j].url, 'progress': Tasks[j].progress, 'id': Tasks[j].id, 'name': Tasks[j].saveAs});
             
             // Set active tasks count in title
             if(RemoteTasksIDs.length > 0)
@@ -430,11 +443,11 @@ $(function() {
                     historyDiv.show().css({ display: 'block' });
                     historyList.empty();
                     for(var i = 0; i < list.length; ++i) {
-                        var cssClass = (list[i].success === true) ? 'ok' : 'err';
-                        var hrefTitle = (list[i].success === true) ? '' : 'Task completed with error';
-                        historyList.append('<li><a href="'+list[i].url+'" title="'+hrefTitle+'" class="'+cssClass+'">'+getLabelTextFromUrl(list[i].url)+'</li>');
+                        var cssClass  = (list[i].success === true) ? 'ok' : 'err';
+                        var hrefTitle = (list[i].success === true) ? list[i].url : 'Task completed with error';
+                        var hrefText  = ((typeof list[i].savedAs === 'string') && (list[i].savedAs.length > 0)) ? list[i].savedAs : getLabelTextFromUrl(list[i].url);
+                        historyList.append('<li><a href="'+list[i].url+'" title="'+hrefTitle+'" class="'+cssClass+'">'+hrefText+'</li>');
                     }
-                    
                     if(firstShow) historyDiv.animate({ opacity: 1 });
                 } else {
                     historyDiv.fadeOut();
@@ -508,10 +521,22 @@ $(function() {
             }, 500);
     }
     
+    /* Set task label text */
+    function setTaskLabelText(taskID, labelText) {
+        if(typeof taskID !== 'number') return;
+        if((typeof labelText !== 'string') || (labelText.length == 0)) return;
+        
+        getTaskObj(taskID).find('td.name').first().find('a').first()
+            .text(labelText)
+            .attr('title', labelText);
+    }
+    
     function addTaskGui(data) {
-        /* data = {'url': 'http://foo.com/bar.dat, 'progress': 50, 'id': 12345} */
-        var url    = data.url,
-            labelText = getLabelTextFromUrl(url),
+        /* data = {'url': 'http://foo.com/bar.dat, 'progress': 50, 'id': 12345, 'name': 'somename'} */
+        if(DebugMode) console.log('addTaskGui() data: ', data);
+        var url = data.url,
+            saveas = data.saveas,
+            labelText = ((typeof data.name === 'string') && (data.name.length !== 0)) ? data.name : getLabelTextFromUrl(url),
             taskID = data.id, /* set task ID */
             html = '<div class="task id'+taskID+'">'+
                        '<table><tr>'+
@@ -520,6 +545,7 @@ $(function() {
                        '<td class="actions"><input type="button" class="button cancel red-hover" value="Cancel" /></td>'+
                        '</td></table>'+
                    '</div>';
+                   
         root.append(html);
         var taskObj = root.find('div.task').last();
         taskObj

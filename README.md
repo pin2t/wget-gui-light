@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.1/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.3/lightgrey.png)
 
 #### Что это?
 
@@ -48,6 +48,10 @@ php  | Необходим выключенный [safe_mode], разрешени
 Скрипт отвечает на POST и GET запросы, запросы из командной строки. Например:
 
 > `php ./rpc.php get_list`<br />`php ./rpc.php add_task http://goo.gl/5Qi0Xs`
+
+Поддерживается работа (автоматическое получение прямых ссылок) со следующими ресурсами:
+
+* YouTube
 
 #### Особенности и настройки клиентской части
 
@@ -169,7 +173,7 @@ php  | Необходим выключенный [safe_mode], разрешени
 
 [JQuery]:http://jquery.com/
 [notifIt]:https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html
-[url.js]:http://habrahabr.ru/post/232073/
+[url.js]:https://github.com/websanova/js-url
 [CSS3 progress bar]:http://css-tricks.com/css3-progress-bars/
 [jquery.cookie.js]:https://github.com/carhartl/jquery-cookie
 [bPopup]:http://dinbror.dk/bpopup/

@@ -16,7 +16,7 @@
 
 ## Add debug info to log and output. Comment this line or set 'false' for 
 ##   disable this feature
-#define('DebugMode', true);
+#define('DebugMode', false);
 
 ## Settings paths
 ##   Path to directory, where this script located
@@ -194,6 +194,31 @@ function validatePid($pid) {
 }
 
 /**
+ * Make string clear, for file system file name
+ *
+ * @param  (string) (str) Input string
+ * @return (string)
+ */
+function makeStringSafe($str) {
+    return str_replace(array("'", "\"", "\\", "/", "*", "$", "|", "`", "<", ">", "?", ":", "\n", "\r", "\t", "\0"), "", $str);
+}
+
+/**
+ * Make url clear, without 'unsecure' chars
+ *
+ * @param  (string) (str) Input string
+ * @return (string)
+ */
+function makeUrlSafe($str) {
+    return str_replace( // http://tools.ietf.org/html/rfc1738
+        // encode url string, and make "back-encode" some important for wget chars
+        array('%2F', '%3A', '%40', '%3F', '%3D', '%26'),
+        array('/',   ':',   '@',   '?',   '=',   '&'),
+        rawurlencode($str)
+    );
+}
+
+/**
  * Get wget tasks from `ps` 'as is'; or only with string, if $string is not
  *  empty (passed in $string); or with PID = $string, if $string is 
  *  valid PID
@@ -216,15 +241,20 @@ function getWgetTasksList($string = '') {
         // make FAST search:
         // find string with 'wget' and without '2>&1'
         if((strpos($task, 'wget') !== false) && (strpos($task, $string) !== false)) {
-            preg_match("/(\d{1,5})\swget.*--output-file=(\/.*\d{3,6}\.log\.tmp).*".wget_secret_flag."\s(.*)/i", $task, $founded);
-            $pid = @$founded[1]; $logfile = @$founded[2]; $url = @$founded[3];
-            if(validatePid($pid)) 
+            preg_match("/(\d{1,5})\swget.*--output-file=(\/.*\d{3,6}\.log\.tmp)(.*)".wget_secret_flag."\s(.*)/i", $task, $founded);
+            //var_dump($task); var_dump($founded);
+            $pid = @$founded[1]; $logfile = @$founded[2]; $etcParams = @$founded[3]; $url = @$founded[4];
+            if(validatePid($pid)) {
+                //var_dump($etcParams);
+                preg_match('/--output-document=.*\/(.*?)\s$/', $etcParams, $etcParts);
                 array_push($result, array(
                     'raw'     => (string) @$founded[0],
+                    'saveAs'  => (string) @$etcParts[1],
                     'pid'     => (int) $pid,
                     'logfile' => (string) $logfile,
                     'url'     => (string) $url
                 ));
+            }
         }
     }
     
@@ -281,6 +311,7 @@ function getWgetTasks() {
             array_push($result, array(
                 'pid'      => (int) $task['pid'],
                 'logfile'  => (string) $task['logfile'],
+                'saveAs'   => (string) $task['saveAs'],
                 'progress' => (int) $preogress,
                 'url'      => (string) $task['url']
             ));
@@ -318,7 +349,7 @@ function removeWgetTask($pid) {
     $kill = @posix_kill((int) $taskData['pid'], 15); // http://php.net/manual/ru/function.posix-kill.php
     if(!$kill) log::error('Task with PID '.$taskData['pid'].' NOT killed');
     
-    usleep(200000); // at first - subprocess must del file. if not - when del we // 2/10 sec
+    usleep(200000); // at first - subprocess must del file. if not - when del we // 1/5 sec
     if (!empty($taskData['logfile']) && file_exists($taskData['logfile'])) {
         log::notice('removeWgetTask() remove file '.var_export($taskData['logfile'], true));
         $del = @unlink($taskData['logfile']); // http://php.net//manual/ru/function.unlink.php
@@ -360,6 +391,9 @@ function addWgetTask($url, $saveAs) {
     }
     log::debug('(call) addWgetTask() called, $url='.var_export($url, true).', $saveAs='.var_export($saveAs, true));
     
+    $urlWasChanged = false; // flag - url was changed (parsed), or will be not changed
+    define('OriginalTaskUrl', $url); // Save in constant original task url
+    
     if(empty($url)) return array('result' => false, 'msg' => 'No URL');
     
     if(defined('WgetOnetimeLimit') && (count(getWgetTasks())+1 > WgetOnetimeLimit)) {
@@ -377,24 +411,86 @@ function addWgetTask($url, $saveAs) {
         return array('result' => false, 'msg' => 'Cannot create directory for downloads');
     }
     
-    $historyAction = '';
+    // DOWNLOAD YOUTUBE VIDEO
+    // Detect - if url is link to youtube video
+    if((strpos($url, 'youtube.com/') !== false) || (strpos($url, 'youtu.be/') !== false)) {
+        $youtubeVideos = array();
+        // http://stackoverflow.com/a/10315969/2252921
+        preg_match('/^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/', $url, $founded);
+        // $founded[1] - is video ID
+        if(isset($founded[1]) && !empty($founded[1]) && (strlen($founded[1]) == 11)) {
+            $rawVideoInfo = file_get_contents('http://youtube.com/get_video_info?video_id='.$founded[1]);
+            if(($rawVideoInfo !== false)) {
+                parse_str($rawVideoInfo, $videoInfo);
+                //var_dump($videoInfo);
+                if(isset($videoInfo['url_encoded_fmt_stream_map'])) {
+                    $my_formats_array = explode(',', $videoInfo['url_encoded_fmt_stream_map']);
+                    foreach($my_formats_array as $videoItem) {
+                        parse_str($videoItem, $videoItemData);
+                        if(isset($videoItemData['url'])) {
+                            //var_dump($videoItemData);
+                            array_push($youtubeVideos, array(
+                                'title'     => @$videoInfo['title'],
+                                'thumbnail' => @$videoInfo['thumbnail_url'], // or 'iurlsd'
+                                'url'       => urldecode($videoItemData['url']),
+                                'type'      => @$videoItemData['type'],
+                                'quality'   => @$videoItemData['quality']
+                            ));
+                        } else
+                            log::error('Link to youtube video not exists '.var_export($videoItemData, true)); 
+                    }
+                } else
+                    log::error('Youtube answer not contains \'url_encoded_fmt_stream_map\''); 
+                
+            } else
+                log::error('Cannot call "file_get_contents()" for $url='.var_export($url, true));
+        }
+        //var_dump($youtubeVideos);
+        
+        // If we found video links
+        if(count($youtubeVideos) > 0) {
+            $videoToDownload = $youtubeVideos[0]; // get first (HD) video
+            
+            preg_match('~\/(.*?)\;~', $videoToDownload['type'], $extension);
+            switch (@$extension[1]) {
+                case 'mp4':   $fileExtension = 'mp4';  break;
+                case 'webm':  $fileExtension = 'webm'; break;
+                case 'x-flv': $fileExtension = 'flv';  break;
+                case '3gpp':  $fileExtension = '3gp';  break;
+                default: $fileExtension = 'video';
+            }
+            
+            // Tadaaam :)
+            $urlWasChanged = true;
+            $url = $videoToDownload['url'];
+            if(empty($saveAs))
+                $saveAs = $videoToDownload['title'].' ('.$videoToDownload['quality'].').'.$fileExtension;
+        }
+    }
+    
+    $historyAction = ''; $saveAs = makeStringSafe($saveAs);
     if(defined('history'))
         if(checkDirectory(dirname(history))) {
-            $historyAction = '; if [ "$?" = "0" ]; then '.
-                                   'echo "Success: \"'.$url.'\"" >> "'.history.'"; '.
+            $savedAsCmdString = (!empty($saveAs)) ? ' ## SavedAs: \"'.$saveAs.'\"' : '';
+            // If string passed in '$url' and saved 'OriginalTaskUrl' not equal each other,
+            //   we understand - URL was PARSED and changed. And now, for a history 
+            //   (tadatadaaaam =)) we must write ORIGINAL url (not parsed)
+            $urlForHistory = ($url !== OriginalTaskUrl) ? OriginalTaskUrl : $url;
+            $urlForHistoryCmd = ($url !== OriginalTaskUrl) ? ' && URL="'.$urlForHistory.'"' : '';
+            $historyAction = ' && HISTORY="'.history.'"'.$urlForHistoryCmd.' && if [ "$?" = "0" ]; then '.
+                                   'echo "Success: \"$URL\"'.$savedAsCmdString.'" >> "$HISTORY"; '.
                                'else '.
-                                   'echo "Failed: \"'.$url.'\"" >> "'.history.'"; '.
+                                   'echo "Failed: \"$URL\"" >> "$HISTORY"; '.
                                'fi';
-        } else {
+        } else
             log::error('Directory '.var_export(dirname(history), true).' cannot be created');
-        }
- 
+            
     $speedLimit = (defined('wget_download_limit')) ? '--limit-rate='.wget_download_limit.'k ' : ' ';
     $saveAsFile  = (!empty($saveAs)) ? '--output-document="'.download_path.'/'.$saveAs.'" ' : ' ';
     $tmpFileName = tmp_path.'/wget'.rand(1, 32768).'.log.tmp';
     
-    $cmd = '(echo > "'.$tmpFileName.'"; '.wget.' '.
-        '--progress=bar:force '.
+    $cmd = '(URL="'.$url.'"; TMPFILE="'.$tmpFileName.'"; echo > "$TMPFILE"; '.wget.' '.
+        '--progress=bar:force --output-file="$TMPFILE" '. // forever stand at beginning
         '--tries=0 '.
         '--no-cache '.
         '--user-agent="Mozilla/5.0 (X11; Linux amd64; rv:21.0) Gecko/20100101 Firefox/21.0" '.
@@ -403,9 +499,8 @@ function addWgetTask($url, $saveAs) {
         '--restrict-file-names=nocontrol '. // For Cyrillic correct filenames
         $speedLimit.
         $saveAsFile.
-        ' --output-file="'.$tmpFileName.'" '.
-        wget_secret_flag.' '.
-        '"'.$url.'"'.$historyAction.'; '.rm.' -f "'.$tmpFileName.'") > /dev/null 2>&1 & echo $!';
+        wget_secret_flag.' '. // forever LAST param
+        '"$URL"'.$historyAction.'; '.rm.' -f "$TMPFILE") > /dev/null 2>&1 & echo $!';
     
     log::debug('Command to exec: '.var_export($cmd, true));
     
@@ -498,13 +593,20 @@ function getTasksHistory($count = 5) {
     $result = array();
     $offset = ($count < count($hist)) ? count($hist)-$count : 0;
     for ($i = $offset; $i < count($hist); $i++) {
+        $subResult = array();
         $currentLine = $hist[$i];
-        preg_match("/([A-Za-z]+)\:\s\"(.*)\"/i", $currentLine, $founded);
-        if(isset($founded[1]) && !empty($founded[1]) && isset($founded[2]) && !empty($founded[2]))
-            array_push($result, array(
-                'success' => (strpos(strtolower($founded[1]), 'success') !== false) ? true : false,
-                'url'     => (string) $founded[2]
-            ));
+        preg_match("/([A-Za-z]+)\:\s\"(.*?)\"/i", $currentLine, $founded);
+        //var_dump($founded);
+        if(isset($founded[1]) && !empty($founded[1]) && isset($founded[2]) && !empty($founded[2])) {
+            $subResult['success'] = (string) (strpos(strtolower($founded[1]), 'success') !== false) ? true : false;
+            $subResult['url']     = (string) $founded[2];
+            
+            preg_match("/\s\#\#\sSavedAs\:\s\"(.*?)\"/i", $currentLine, $saveAsRaw);
+            if(isset($saveAsRaw[1]) && !empty($saveAsRaw[1]))
+                $subResult['savedAs'] = (string) $saveAsRaw[1];
+
+            array_push($result, $subResult);
+        }
     }
     return $result;
 }
@@ -564,13 +666,8 @@ if(!empty($_GET['action'])) {
     // Set value from GET array to $formData
     $formData = array(
         'action' => preg_replace("/[^a-z_]/", "", strtolower(@$_GET['action'])),
-        'url'    => str_replace( // http://tools.ietf.org/html/rfc1738
-            // encode url string, and make "back-encode" some important for wget chars
-            array('%2F', '%3A', '%40', '%3F', '%3D', '%26'),
-            array('/',   ':',   '@',   '?',   '=',   '&'),
-            rawurlencode(@$_GET['url'])
-        ),
-        'saveAs' => str_replace(array("'", "\"", "\\", "/", "*", "$", "|", "`", "<", ">", "?", ":", "\n", "\r", "\t", "\0"), '', @$_GET['saveAs']),
+        'url'    => makeUrlSafe(@$_GET['url']),
+        'saveAs' => makeStringSafe(@$_GET['saveAs']),
         'id'     => preg_replace("/[^0-9]/", "", @$_GET['id'])
     );
     
@@ -585,6 +682,7 @@ if(!empty($_GET['action'])) {
             foreach (getWgetTasks() as $task) {
                 array_push($result['tasks'], array(
                     'url'      => (string) $task['url'],
+                    'saveAs'   => (string) $task['saveAs'],
                     'progress' => (int) $task['progress'],
                     'id'       => (int) $task['pid']
                 ));
@@ -641,6 +739,9 @@ if(!empty($_GET['action'])) {
                 $result['history'] = $historyItems;
                 $result['msg']     = 'Recent '.$itemsCount.' history entries';
                 $result['status']  = 1;
+            } else {
+                $result['msg']    = 'History is empty';
+                $result['status'] = 0;
             }
 
             break;
