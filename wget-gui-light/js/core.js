@@ -261,7 +261,7 @@ $(function() {
         }
         
         // Notify is passed link - is not supported video link
-        if(/http.?\:\/\/.*vk\.com\/video.*_.*/i.test(fileUrl)) {
+        if(/http.?\:\/\/.*vk\.com\/video\d{1,11}_\d{1,15}$/i.test(fileUrl)) {
             notif({type: "error", position: "center", msg: "This link format not supported, use this:<br /><br />https://vk.com/<b>video_ext.php</b>?oid=1&id=164841344&hash=c8de45fc73389353"});
             return false;
         }
