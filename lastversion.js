@@ -1,8 +1,8 @@
 var web_wgetguilight = {
-    "version": "0.1.3",
+    "version": "0.1.4",
     "name": "Wget GUI light",
     "lastUpdate": {
-        "shortDesc": "Changed url.js parser, added youtube video download, other fixes",
+        "shortDesc": "Downloaded files names transliterated now, added vk.com video support, small fixes",
         "fullDescUrl": "https://github.com/tarampampam/wget-gui-light/blob/master/cahngeslog.md"
     },
     "download": {

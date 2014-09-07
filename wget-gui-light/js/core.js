@@ -243,13 +243,26 @@ $(function() {
     }
     
     /* add task function */
-    function addTask(fileUrl, progress) {
+    function addTask(fileUrl, progress) {    
+        // Add VK external video code support
+        if(/\<iframe\s.*src=\"http.?\:\/\/.*vk\.com\/video_ext\.php\?.*\".*\>/i.test(fileUrl)) {
+            var vkVideoUrlParts = fileUrl.match(/\<iframe\s.*src=\"(.*?)\"/i),
+                fileUrl = vkVideoUrlParts[1].replace("https", "http");
+            taskInput.val(fileUrl);
+        }
+
         // Make some clear
         fileUrl = clearString(fileUrl);
         
         // Make fast check
         if((typeof fileUrl !== 'string') || (fileUrl == '')) {
             notif({type: "warning", position: "center", msg: "Address cannot be empty"});
+            return false;
+        }
+        
+        // Notify is passed link - is not supported video link
+        if(/http.?\:\/\/.*vk\.com\/video.*_.*/i.test(fileUrl)) {
+            notif({type: "error", position: "center", msg: "This link format not supported, use this:<br /><br />https://vk.com/<b>video_ext.php</b>?oid=1&id=164841344&hash=c8de45fc73389353"});
             return false;
         }
         
@@ -262,8 +275,6 @@ $(function() {
         var fileUrl = (fileUrl.substring(3, 8).indexOf('://') == -1) ? 'http://'+fileUrl : fileUrl,
             urls = fileUrl.split(/\r*\n/),
             brokenUrls = [], validUrls = [];
-
-
             
         // Make urls check
         for(var i = 0; i < urls.length; ++i) {
@@ -310,7 +321,7 @@ $(function() {
                             addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id, 'name': result.saveAs});
                         } else
                             // or only show message
-                            notif({type: "warning", multiline: true, time: 10000, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
+                            notif({type: "warning", multiline: true, autohide: false, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
                         // If it is last task in stack - make sync
                         if(result.isLast) syncTasksList();
                     } else {
@@ -446,7 +457,7 @@ $(function() {
                         var cssClass  = (list[i].success === true) ? 'ok' : 'err';
                         var hrefTitle = (list[i].success === true) ? list[i].url : 'Task completed with error';
                         var hrefText  = ((typeof list[i].savedAs === 'string') && (list[i].savedAs.length > 0)) ? list[i].savedAs : getLabelTextFromUrl(list[i].url);
-                        historyList.append('<li><a href="'+list[i].url+'" title="'+hrefTitle+'" class="'+cssClass+'">'+hrefText+'</li>');
+                        historyList.append('<li><a href="'+list[i].url+'" title="'+hrefTitle+'" class="'+cssClass+'" target="_blank">'+hrefText+'</li>');
                     }
                     if(firstShow) historyDiv.animate({ opacity: 1 });
                 } else {

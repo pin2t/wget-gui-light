@@ -7,7 +7,7 @@
 ## @github    https://github.com/tarampampam/wget-gui-light
 ## @version   Look in 'version.js'
 ##
-## @depends   *nix, php5, wget, bash, ps, rm
+## @depends   *nix, php5 (PECL json >= 1.2.0), wget, bash, ps, rm
 
 
 # *****************************************************************************
@@ -16,7 +16,7 @@
 
 ## Add debug info to log and output. Comment this line or set 'false' for 
 ##   disable this feature
-#define('DebugMode', false);
+#define('DebugMode', true);
 
 ## Settings paths
 ##   Path to directory, where this script located
@@ -154,6 +154,102 @@ class log {
 }
 
 /**
+ * Converts all accent characters to ASCII characters (short version)
+ *
+ * Full (original) version here: http://goo.gl/ndT7gT
+ *
+ * @param  (string) (string) Text that might have accent characters
+ * @return (string) Filtered string with replaced "nice" characters
+ */
+// http://stackoverflow.com/a/10790734/2252921
+function remove_accents($string) {
+    if ( !preg_match('/[\x80-\xff]/', $string) )
+        return $string;
+    $chars = array(
+    // Decompositions for Latin-1 Supplement
+    chr(195).chr(128) => 'A', chr(195).chr(129) => 'A', chr(195).chr(130) => 'A', chr(195).chr(131) => 'A',
+    chr(195).chr(132) => 'A', chr(195).chr(133) => 'A', chr(195).chr(135) => 'C', chr(195).chr(136) => 'E',
+    chr(195).chr(137) => 'E', chr(195).chr(138) => 'E', chr(195).chr(139) => 'E', chr(195).chr(140) => 'I',
+    chr(195).chr(141) => 'I', chr(195).chr(142) => 'I', chr(195).chr(143) => 'I', chr(195).chr(145) => 'N',
+    chr(195).chr(146) => 'O', chr(195).chr(147) => 'O', chr(195).chr(148) => 'O', chr(195).chr(149) => 'O',
+    chr(195).chr(150) => 'O', chr(195).chr(153) => 'U', chr(195).chr(154) => 'U', chr(195).chr(155) => 'U',
+    chr(195).chr(156) => 'U', chr(195).chr(157) => 'Y', chr(195).chr(159) => 's', chr(195).chr(160) => 'a',
+    chr(195).chr(161) => 'a', chr(195).chr(162) => 'a', chr(195).chr(163) => 'a', chr(195).chr(164) => 'a',
+    chr(195).chr(165) => 'a', chr(195).chr(167) => 'c', chr(195).chr(168) => 'e', chr(195).chr(169) => 'e',
+    chr(195).chr(170) => 'e', chr(195).chr(171) => 'e', chr(195).chr(172) => 'i', chr(195).chr(173) => 'i',
+    chr(195).chr(174) => 'i', chr(195).chr(175) => 'i', chr(195).chr(177) => 'n', chr(195).chr(178) => 'o',
+    chr(195).chr(179) => 'o', chr(195).chr(180) => 'o', chr(195).chr(181) => 'o', chr(195).chr(182) => 'o',
+    chr(195).chr(182) => 'o', chr(195).chr(185) => 'u', chr(195).chr(186) => 'u', chr(195).chr(187) => 'u',
+    chr(195).chr(188) => 'u', chr(195).chr(189) => 'y', chr(195).chr(191) => 'y',
+    // Decompositions for Latin Extended-A
+    chr(196).chr(128) => 'A', chr(196).chr(129) => 'a', chr(196).chr(130) => 'A', chr(196).chr(131) => 'a',
+    chr(196).chr(132) => 'A', chr(196).chr(133) => 'a', chr(196).chr(134) => 'C', chr(196).chr(135) => 'c',
+    chr(196).chr(136) => 'C', chr(196).chr(137) => 'c', chr(196).chr(138) => 'C', chr(196).chr(139) => 'c',
+    chr(196).chr(140) => 'C', chr(196).chr(141) => 'c', chr(196).chr(142) => 'D', chr(196).chr(143) => 'd',
+    chr(196).chr(144) => 'D', chr(196).chr(145) => 'd', chr(196).chr(146) => 'E', chr(196).chr(147) => 'e',
+    chr(196).chr(148) => 'E', chr(196).chr(149) => 'e', chr(196).chr(150) => 'E', chr(196).chr(151) => 'e',
+    chr(196).chr(152) => 'E', chr(196).chr(153) => 'e', chr(196).chr(154) => 'E', chr(196).chr(155) => 'e',
+    chr(196).chr(156) => 'G', chr(196).chr(157) => 'g', chr(196).chr(158) => 'G', chr(196).chr(159) => 'g',
+    chr(196).chr(160) => 'G', chr(196).chr(161) => 'g', chr(196).chr(162) => 'G', chr(196).chr(163) => 'g',
+    chr(196).chr(164) => 'H', chr(196).chr(165) => 'h', chr(196).chr(166) => 'H', chr(196).chr(167) => 'h',
+    chr(196).chr(168) => 'I', chr(196).chr(169) => 'i', chr(196).chr(170) => 'I', chr(196).chr(171) => 'i',
+    chr(196).chr(172) => 'I', chr(196).chr(173) => 'i', chr(196).chr(174) => 'I', chr(196).chr(175) => 'i',
+    chr(196).chr(176) => 'I', chr(196).chr(177) => 'i', chr(196).chr(178) => 'IJ',chr(196).chr(179) => 'ij',
+    chr(196).chr(180) => 'J', chr(196).chr(181) => 'j', chr(196).chr(182) => 'K', chr(196).chr(183) => 'k',
+    chr(196).chr(184) => 'k', chr(196).chr(185) => 'L', chr(196).chr(186) => 'l', chr(196).chr(187) => 'L',
+    chr(196).chr(188) => 'l', chr(196).chr(189) => 'L', chr(196).chr(190) => 'l', chr(196).chr(191) => 'L',
+    chr(197).chr(128) => 'l', chr(197).chr(129) => 'L', chr(197).chr(130) => 'l', chr(197).chr(131) => 'N',
+    chr(197).chr(132) => 'n', chr(197).chr(133) => 'N', chr(197).chr(134) => 'n', chr(197).chr(135) => 'N',
+    chr(197).chr(136) => 'n', chr(197).chr(137) => 'N', chr(197).chr(138) => 'n', chr(197).chr(139) => 'N',
+    chr(197).chr(140) => 'O', chr(197).chr(141) => 'o', chr(197).chr(142) => 'O', chr(197).chr(143) => 'o',
+    chr(197).chr(144) => 'O', chr(197).chr(145) => 'o', chr(197).chr(146) => 'OE',chr(197).chr(147) => 'oe',
+    chr(197).chr(148) => 'R', chr(197).chr(149) => 'r', chr(197).chr(150) => 'R', chr(197).chr(151) => 'r',
+    chr(197).chr(152) => 'R', chr(197).chr(153) => 'r', chr(197).chr(154) => 'S', chr(197).chr(155) => 's',
+    chr(197).chr(156) => 'S', chr(197).chr(157) => 's', chr(197).chr(158) => 'S', chr(197).chr(159) => 's',
+    chr(197).chr(160) => 'S', chr(197).chr(161) => 's', chr(197).chr(162) => 'T', chr(197).chr(163) => 't',
+    chr(197).chr(164) => 'T', chr(197).chr(165) => 't', chr(197).chr(166) => 'T', chr(197).chr(167) => 't',
+    chr(197).chr(168) => 'U', chr(197).chr(169) => 'u', chr(197).chr(170) => 'U', chr(197).chr(171) => 'u',
+    chr(197).chr(172) => 'U', chr(197).chr(173) => 'u', chr(197).chr(174) => 'U', chr(197).chr(175) => 'u',
+    chr(197).chr(176) => 'U', chr(197).chr(177) => 'u', chr(197).chr(178) => 'U', chr(197).chr(179) => 'u',
+    chr(197).chr(180) => 'W', chr(197).chr(181) => 'w', chr(197).chr(182) => 'Y', chr(197).chr(183) => 'y',
+    chr(197).chr(184) => 'Y', chr(197).chr(185) => 'Z', chr(197).chr(186) => 'z', chr(197).chr(187) => 'Z',
+    chr(197).chr(188) => 'z', chr(197).chr(189) => 'Z', chr(197).chr(190) => 'z', chr(197).chr(191) => 's');
+    $string = strtr($string, $chars);
+    return $string;
+}
+
+/**
+ * Transliterate string
+ *
+ * @param  (string) (string) Input string
+ * @return (string) transliterated string
+ */
+function transliterate($string) {
+    // http://goo.gl/ZOiMGL - ISO/R 9 (1968), GOST 16876-71, OON (1987)
+    $q = chr(226).chr(128).chr(179); $s = chr(226).chr(128).chr(178); 
+    $chars = array(
+    chr(208).chr(144) => 'A', chr(208).chr(176) => 'a', chr(208).chr(145) => 'B', chr(208).chr(177) => 'b',
+    chr(208).chr(146) => 'V', chr(208).chr(178) => 'v', chr(208).chr(147) => 'G', chr(208).chr(179) => 'g',
+    chr(208).chr(148) => 'D', chr(208).chr(180) => 'd', chr(208).chr(149) => 'E', chr(208).chr(181) => 'e',
+    chr(208).chr(129) => 'Jo',chr(209).chr(145) => 'jo',chr(208).chr(150) => 'Zh',chr(208).chr(182) => 'zh',
+    chr(208).chr(151) => 'Z', chr(208).chr(183) => 'z', chr(208).chr(152) => 'I', chr(208).chr(184) => 'i',
+    chr(208).chr(153) => 'Jj',chr(208).chr(185) => 'jj',chr(208).chr(154) => 'K', chr(208).chr(186) => 'k',
+    chr(208).chr(155) => 'L', chr(208).chr(187) => 'l', chr(208).chr(156) => 'M', chr(208).chr(188) => 'm',
+    chr(208).chr(157) => 'N', chr(208).chr(189) => 'n', chr(208).chr(158) => 'O', chr(208).chr(190) => 'o',
+    chr(208).chr(159) => 'P', chr(208).chr(191) => 'p', chr(208).chr(160) => 'R', chr(209).chr(128) => 'r',
+    chr(208).chr(161) => 'S', chr(209).chr(129) => 's', chr(208).chr(162) => 'T', chr(209).chr(130) => 't',
+    chr(208).chr(163) => 'U', chr(209).chr(131) => 'u', chr(208).chr(164) => 'F', chr(209).chr(132) => 'f',
+    chr(208).chr(165) => 'Kh',chr(209).chr(133) => 'kh',chr(208).chr(166) => 'C', chr(209).chr(134) => 'c',
+    chr(208).chr(167) => 'Ch',chr(209).chr(135) => 'ch',chr(208).chr(168) => 'Sh',chr(209).chr(136) => 'sh',
+    chr(208).chr(169) =>'Shh',chr(209).chr(137) =>'shh',chr(208).chr(170) => $q,  chr(209).chr(138) => $q,
+    chr(208).chr(171) => 'Y', chr(209).chr(139) => 'y', chr(208).chr(172) => $s,  chr(209).chr(140) => $s,
+    chr(208).chr(173) => 'Eh',chr(209).chr(141) => 'eh',chr(208).chr(174) => 'Ju',chr(209).chr(142) => 'ju',
+    chr(208).chr(175) => 'Ya',chr(209).chr(143) => 'ja');
+    $string = strtr($string, $chars);
+    return $string;
+}
+
+/**
  * Make system command call, return result as string or array
  *
  * @param  (string) (cmd) Command for execute
@@ -166,7 +262,8 @@ function bash($cmd, $result_type = '') {
     if(empty($cmd))
         return false;
         
-    exec($cmd, $out);
+    // Switch output language to English
+    exec('export LC_ALL=C; '.$cmd, $out);
     
     $result_type = empty($result_type) ? 'string' : $result_type;
     
@@ -200,7 +297,15 @@ function validatePid($pid) {
  * @return (string)
  */
 function makeStringSafe($str) {
-    return str_replace(array("'", "\"", "\\", "/", "*", "$", "|", "`", "<", ">", "?", ":", "\n", "\r", "\t", "\0"), "", $str);
+    return trim(
+        str_replace(array('  '), array(' '), 
+            preg_replace('/[^a-zA-Z0-9_ %\[\]\.\(\)%&-]/s', '', 
+                remove_accents(
+                    transliterate($str)
+                )
+            )
+        )
+    );
 }
 
 /**
@@ -245,8 +350,8 @@ function getWgetTasksList($string = '') {
             //var_dump($task); var_dump($founded);
             $pid = @$founded[1]; $logfile = @$founded[2]; $etcParams = @$founded[3]; $url = @$founded[4];
             if(validatePid($pid)) {
-                //var_dump($etcParams);
                 preg_match('/--output-document=.*\/(.*?)\s$/', $etcParams, $etcParts);
+                //var_dump($etcParts);
                 array_push($result, array(
                     'raw'     => (string) @$founded[0],
                     'saveAs'  => (string) @$etcParts[1],
@@ -283,7 +388,7 @@ function getWgetTasks() {
     $result = array();
 
     foreach(getWgetTasksList('') as $task) {
-        $preogress = 0; 
+        $preogress = 0;
         if(validatePid($task['pid']) && is_string($task['url']) && !empty($task['url'])) {
             if (!empty($task['logfile']) && file_exists($task['logfile'])) {
                 // Read last line <http://stackoverflow.com/a/1510248>
@@ -391,7 +496,6 @@ function addWgetTask($url, $saveAs) {
     }
     log::debug('(call) addWgetTask() called, $url='.var_export($url, true).', $saveAs='.var_export($saveAs, true));
     
-    $urlWasChanged = false; // flag - url was changed (parsed), or will be not changed
     define('OriginalTaskUrl', $url); // Save in constant original task url
     
     if(empty($url)) return array('result' => false, 'msg' => 'No URL');
@@ -417,9 +521,9 @@ function addWgetTask($url, $saveAs) {
         $youtubeVideos = array();
         // http://stackoverflow.com/a/10315969/2252921
         preg_match('/^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/', $url, $founded);
-        // $founded[1] - is video ID
-        if(isset($founded[1]) && !empty($founded[1]) && (strlen($founded[1]) == 11)) {
-            $rawVideoInfo = file_get_contents('http://youtube.com/get_video_info?video_id='.$founded[1]);
+        define('YoutubeVideoID', @$founded[1]); // Set as constant YouTube video ID
+        if(strlen(YoutubeVideoID) == 11) {
+            $rawVideoInfo = file_get_contents('http://youtube.com/get_video_info?video_id='.YoutubeVideoID.'&ps=default&eurl=&gl=US&hl=en');
             if(($rawVideoInfo !== false)) {
                 parse_str($rawVideoInfo, $videoInfo);
                 //var_dump($videoInfo);
@@ -429,27 +533,55 @@ function addWgetTask($url, $saveAs) {
                         parse_str($videoItem, $videoItemData);
                         if(isset($videoItemData['url'])) {
                             //var_dump($videoItemData);
+                            switch (@$videoItemData['quality']) {
+                                case 'small':  $videoItemData['quality'] = '240p'; break;
+                                case 'medium': $videoItemData['quality'] = '360p'; break;
+                                case 'large':  $videoItemData['quality'] = '480p'; break;
+                                case 'hd720':  $videoItemData['quality'] = '720p'; break;
+                                case 'hd1080': $videoItemData['quality'] = '1080p'; break;
+                            }
                             array_push($youtubeVideos, array(
-                                'title'     => @$videoInfo['title'],
+                                'title'     => trim(@$videoInfo['title']),
                                 'thumbnail' => @$videoInfo['thumbnail_url'], // or 'iurlsd'
                                 'url'       => urldecode($videoItemData['url']),
                                 'type'      => @$videoItemData['type'],
                                 'quality'   => @$videoItemData['quality']
                             ));
-                        } else
-                            log::error('Link to youtube video not exists '.var_export($videoItemData, true)); 
+                        } else {
+                            log::error('Link to youtube source video file not exists '.var_export($videoItemData, true)); 
+                            return array('result' => false, 'msg' => 'Link to youtube source video file not exists');
+                        }
                     }
-                } else
-                    log::error('Youtube answer not contains \'url_encoded_fmt_stream_map\''); 
+                } else {
+                    $errorDescription = 'Youtube answer not contains data about video files';
+                    if(isset($videoInfo['reason']) && !empty($videoInfo['reason']))
+                        $errorDescription = trim(strip_tags($videoInfo['reason'], '<a><br/>'));
+                    log::error($errorDescription.', raw='.var_export($rawVideoInfo, true));
+                    return array('result' => false, 'msg' => $errorDescription);
+                }
                 
-            } else
+            } else {
                 log::error('Cannot call "file_get_contents()" for $url='.var_export($url, true));
+                return array('result' => false, 'msg' => 'Cannot get remote content');
+            }
         }
         //var_dump($youtubeVideos);
         
         // If we found video links
         if(count($youtubeVideos) > 0) {
-            $videoToDownload = $youtubeVideos[0]; // get first (HD) video
+            // Get first 'mp4' video
+            foreach($youtubeVideos as $video)
+                if(isset($video['type']) && !empty($video['type'])) {
+                    preg_match('~\/(.*?)\;~', $video['type'], $videoType);
+                    if(@$videoType[1] == 'mp4') {
+                        $videoToDownload = $video;
+                        break;
+                    }
+                }
+            
+            // Or take first video (by default - with highest quality)
+            if(!isset($videoToDownload))
+                $videoToDownload = $youtubeVideos[0];
             
             preg_match('~\/(.*?)\;~', $videoToDownload['type'], $extension);
             switch (@$extension[1]) {
@@ -460,13 +592,97 @@ function addWgetTask($url, $saveAs) {
                 default: $fileExtension = 'video';
             }
             
+            $clearTitle = makeStringSafe(@$videoToDownload['title']);
+            
             // Tadaaam :)
-            $urlWasChanged = true;
             $url = $videoToDownload['url'];
             if(empty($saveAs))
-                $saveAs = $videoToDownload['title'].' ('.$videoToDownload['quality'].').'.$fileExtension;
+                if(empty($clearTitle))
+                    $saveAs = 'youtube_video_id'.YoutubeVideoID.' ('.$videoToDownload['quality'].').'.$fileExtension;
+                else
+                    $saveAs = $videoToDownload['title'].' ('.$videoToDownload['quality'].').'.$fileExtension;
         }
     }
+    
+    // DOWNLOAD VK.COM VIDEO
+    // Detect - if url is link to vk.com video
+    if(strpos($url, 'vk.com/video_ext.php') !== false) {
+        // For test code/decode url - http://meyerweb.com/eric/tools/dencoder/
+        // Get url query and parse it to $q
+        $urlParts = parse_url(urldecode($url)); parse_str($urlParts['query'], $q);
+        define('VkVideoID', @$q['id']); // Set as constant VK video ID
+        if(isset($q['oid'])  && !empty($q['oid']) && is_numeric($q['oid']) &&
+           is_numeric(VkVideoID) &&
+           isset($q['hash']) && !empty($q['hash'])) {
+            // Build request url
+            $queryUrl = 'https://vk.com/video_ext.php?oid='.$q['oid'].'&id='.$q['id'].'&hash='.$q['hash'];
+            
+            // Get page content
+            $rawVideoInfo = file_get_contents($queryUrl);
+            if(($rawVideoInfo !== false)) {
+                if(preg_match('/.*\<div.*id\=\"video_player\".*/im', $rawVideoInfo) !== 0) {
+                    $videoData = array();
+                    
+                    preg_match('/\&amp\;url240\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
+                    $videoData['240'] = urldecode(@$f[1]);
+                    
+                    preg_match('/\&amp\;url360\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
+                    $videoData['360'] = urldecode(@$f[1]);
+                    
+                    preg_match('/\&amp\;url480\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
+                    $videoData['480'] = urldecode(@$f[1]);
+                    
+                    preg_match('/\&amp\;url720\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
+                    $videoData['720'] = urldecode(@$f[1]);
+                    
+                    preg_match('/\&amp\;thumb\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
+                    $videoData['thumbnail'] = trim(urldecode(@$f[1]));
+                    
+                    preg_match('/\&amp\;md_title\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
+                    $videoData['title'] = trim(urldecode(@$f[1]));
+                    
+                    // video in low quality always must exists, if parse complete without errors
+                    if(isset($videoData['240']) && !empty($videoData['240'])) {
+                        $videoQualityStr = '';
+                        if(isset($videoData['240']) && !empty($videoData['240'])) {
+                            $url = $videoData['240']; $videoQualityStr = '240p';
+                        }
+                        if(isset($videoData['360']) && !empty($videoData['360'])) {
+                            $url = $videoData['360']; $videoQualityStr = '360p';
+                        }
+                        if(isset($videoData['480']) && !empty($videoData['480'])) {
+                            $url = $videoData['480']; $videoQualityStr = '480p';
+                        }
+                        if(isset($videoData['720']) && !empty($videoData['720'])) {
+                            $url = $videoData['720']; $videoQualityStr = '720p';
+                        }
+
+                        $clearTitle = makeStringSafe(@$videoData['title']);
+
+                        if(empty($saveAs))
+                            if(empty($clearTitle))
+                                $saveAs = 'vk_video_id'.VkVideoID.' ('.$videoQualityStr.').mp4';
+                            else
+                                $saveAs = $clearTitle.' ('.$videoQualityStr.').mp4';
+                    } else {
+                        log::error('Link to video file not found');
+                        return array('result' => false, 'msg' => 'Link to video file not found');
+                    }
+                } else {
+                    log::error('Video container not found $queryUrl='.var_export($queryUrl, true));
+                    return array('result' => false, 'msg' => 'Video container not found');
+                }
+            } else {
+                log::error('Cannot call "file_get_contents()" for $url='.var_export($url, true));
+                return array('result' => false, 'msg' => 'Cannot get remote content');
+            }
+        } else {
+            log::error('Request error - some important query part not exists, $url='.var_export($url, true));
+            return array('result' => false, 'msg' => 'Request error - some important query part(s) not exists');
+        }
+    }
+    
+    //var_dump($videoToDownload);
     
     $historyAction = ''; $saveAs = makeStringSafe($saveAs);
     if(defined('history'))
@@ -621,7 +837,7 @@ function getTasksHistory($count = 5) {
 function echoResult($data, $type) {
     log::debug('Returned data: '.var_export($data, true));
     $type = (empty($type)) ? 'json' : (string) $type;
-    
+
     switch ($type) {
         case 'json':
             echo(json_encode($data));
@@ -680,6 +896,7 @@ if(!empty($_GET['action'])) {
             $result['tasks'] = array();
             
             foreach (getWgetTasks() as $task) {
+                
                 array_push($result['tasks'], array(
                     'url'      => (string) $task['url'],
                     'saveAs'   => (string) $task['saveAs'],
@@ -687,12 +904,12 @@ if(!empty($_GET['action'])) {
                     'id'       => (int) $task['pid']
                 ));
             }
-            
+
             if(!empty($result['tasks']))
                 $result['msg'] = 'Active tasks list';
             else
                 $result['msg'] = 'No active tasks';
-                
+
             $result['status'] = 1;
             break;
             
@@ -732,7 +949,7 @@ if(!empty($_GET['action'])) {
         ## Action - Get history
         #######################
         case 'get_history':
-            $itemsCount = 10;
+            $itemsCount = 6;
             $historyItems = getTasksHistory($itemsCount);
             
             if(count($historyItems) > 0) {

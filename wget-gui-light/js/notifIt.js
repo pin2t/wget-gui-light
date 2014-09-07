@@ -7,15 +7,15 @@ function notif(config) {
         type: "info",
         width: 400,
         height: 60,
-        position: "right",
+        position: "center",
         autohide: 1,
-        msg: "This is my default message",
+        msg: "Tarampampam is here =)",
         opacity: 1,
-        multiline: 0,
+        multiline: 1,
         fade: 0,
         bgcolor: "",
         color: "",
-        timeout: 5000
+        timeout: 8000
     };
     $.extend(defaults, config);
     

@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.3/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.4/lightgrey.png)
 
 #### Что это?
 
@@ -51,7 +51,14 @@ php  | Необходим выключенный [safe_mode], разрешени
 
 Поддерживается работа (автоматическое получение прямых ссылок) со следующими ресурсами:
 
-* YouTube
+* **YouTube**, примеры ссылок:
+  - `http://www.youtube.com/watch?v=o1k8hJ1d8G4`
+  - `http://youtu.be/o1k8hJ1d8G4`
+  - `www.youtube.com/embed/o1k8hJ1d8G4`
+* **vk.com**, примеры ссылок:
+  - `<iframe src="http://vk.com/video_ext.php?oid=25654706&id=167596549&hash=22e03c697e10f723&hd=1" width="607" height="360" frameborder="0"></iframe>`
+  - `http://vk.com/video_ext.php?oid=25654706&id=167596549&hash=22e03c697e10f723`
+
 
 #### Особенности и настройки клиентской части
 
