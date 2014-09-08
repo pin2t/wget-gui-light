@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.4/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.5/lightgrey.png)
 
 #### Что это?
 
@@ -27,7 +27,7 @@ php  | Необходим выключенный [safe_mode], разрешени
  - Тестирование серверной части;
  - Возвращение результатов в формате [JSON].
 
-Основные настройки вынесены в начальную часть файла `rpc.php`, и устанавливаются в формате:
+Основные настройки вынесены в файл `settings.php`, и устанавливаются в формате:
 
 > `define('параметр', 'значение');`
 
@@ -78,7 +78,7 @@ php  | Необходим выключенный [safe_mode], разрешени
 
 При нажатии клавиши **F5** происходит обновление списка задач, страница перезагружается только по нажатию на кнопку "Обновить страницу" в браузере.
 
-Основной [JavaScript] код расположен в файле `js/core.js`, и в верхней его части располагаются основные параметры:
+Основной [JavaScript] код расположен в файле `js/core.js`, но его основные настройки (как и настройки `rpc.php`) располагаются в файле `settings.php`:
 
 Параметр       | Описание
 ------------: | :--------------
@@ -120,7 +120,7 @@ php  | Необходим выключенный [safe_mode], разрешени
 
  * Библиотека "[JQuery]"
  * Парсер ссылок "[url.js]"
- * JQuery-плагин уведомлений "[notifIt]"
+ * JQuery-плагин уведомлений "[jquery.owl]"
  * CSS код из статьи "[CSS3 progress bar]"
  * JQuery-плагин для работы с cookies "[jquery.cookie.js]"
  * JQuery-плагин "выплывающих окон" "[bPopup]"
@@ -179,7 +179,7 @@ php  | Необходим выключенный [safe_mode], разрешени
 [Google Chrome Extension]:https://chrome.google.com/webstore/detail/wget-gui-light/dbcjcjjjijkgihaddcmppppjohbpcail
 
 [JQuery]:http://jquery.com/
-[notifIt]:https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html
+[jquery.owl]:http://codecanyon.net/item/owl-unobtrusive-css3-notifications/408575
 [url.js]:https://github.com/websanova/js-url
 [CSS3 progress bar]:http://css-tricks.com/css3-progress-bars/
 [jquery.cookie.js]:https://github.com/carhartl/jquery-cookie

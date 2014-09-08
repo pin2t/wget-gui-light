@@ -4,11 +4,11 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
-## @version   Look in 'version.js'
+## @version   Look in 'settings.php'
 
 ## 3rd party used tools:
 ##   * jquery           <https://github.com/jquery/jquery>
-##   * notifIt!         <https://dl.dropboxusercontent.com/u/19156616/ficheros/notifIt!-1.1/index.html>
+##   * jquery.owl       <http://codecanyon.net/item/owl-unobtrusive-css3-notifications/408575>
 ##   * url.js           <https://github.com/websanova/js-url>
 ##   * jquery.cookie.js <https://github.com/carhartl/jquery-cookie>
 ##   * bpopup           <http://dinbror.dk/bpopup/>
@@ -16,36 +16,21 @@
 'use strict';
 
 $(function() {
-    var body = $('body').first(),
-        head = $('head').first(),
-        root = $('#tasklist'),
+    var head = $('head').first(), body = $('body').first(),
         favicon = $('#favicon'),
-        taskInput = $('#addTaskAddr'),
-        taskButton = $('#addTaskBtn'),
+        pageTitle = $(document).find('title'),
+        
         menu = $('#menu'),
         menuButton = $('#menu-button'),
-        pageTitle = $(document).find('title'),
+        
+        taskList = $('#tasklist'),
+        taskInput = $('#addTaskAddr'),
+        taskButton = $('#addTaskBtn'),
+        
         titleText = pageTitle.text(),
-        timerHandler = null,
-        wgetGuiCurrentVersion = (typeof WGET_GUI_LIGHT_VERSION === 'string') ? WGET_GUI_LIGHT_VERSION : false, /* declared in 'version.js' */
+        timerHandler = null;
+        // WGET_GUI_LIGHT_VERSION // declared in 'settings.php'
         
-        /* How many requests can be passed in one time */
-        addTasksLimitCount = 5,
-        
-        /* Update interval (in milliseconds). Interval for checking change data loop */
-        updateStatusInterval = 5 * 1000,
-        
-        /* Debug mode (true|false). Enable console.log output */
-        DebugMode = false,
-        
-        /* Enable checking for newest versions */
-        CheckForUpdates = true,
-        
-        /* Check - installed extension for browser, or not? */
-        CheckExtensionInstalled = true,
-        
-        /* IMPORTANT! Path for AJAX requests */
-        prc = 'rpc.php';
 
     if(DebugMode) updateStatusInterval = 0;
     /* *** DESIGN ******************************************************************** */
@@ -63,6 +48,36 @@ $(function() {
     
     if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
         taskInput.height(20); // Fix Firefox auto-height bug
+    }
+    
+    // Show notification function
+    //   Example call is: showNoty({type: 'error', title: 'Title', msg: 'Message'});
+    function showNoty(settings) {
+        var nTitle = ((typeof settings.title !== 'undefined') && (typeof settings.title === 'string')) ? settings.title : '',
+            nContent = ((typeof settings.msg !== 'undefined') && (typeof settings.msg === 'string')) ? settings.msg : '',
+            nTimeout = ((typeof settings.timeout !== 'undefined') && (typeof settings.timeout === 'number')) ? settings.timeout : 10000,
+            nShowTime = ((typeof settings.showTime !== 'undefined') && settings.showTime) ? true : false,
+            nIcon = '',
+            nError = false;
+            
+        switch (settings.type) {
+            case 'success': nIcon = 'W'; break;
+            case 'error': nIcon = 'X'; nError = true; nShowTime = true; break;
+            case 'warning': nIcon = 'c'; break;
+            case 'info': nIcon = '_'; break;
+            default: nIcon = '`';
+        }
+        
+        $.notification({
+            title: nTitle,
+            content: nContent,
+            timeout: nTimeout,
+            error: nError,
+            showTime: nShowTime,
+            fill: true,
+            icon: nIcon,
+            border: true
+        });    
     }
     
     /* *** EXT FUNCTIONS ************************************************************* */
@@ -115,7 +130,11 @@ $(function() {
             })
             .fail(function(answerJSON) {
                 if(DebugMode) console.log('AJAX result: ', answerJSON);
-                notif({type: "error", position: "center", msg: 'Get tasks list &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                showNoty({
+                    type: 'error',
+                    title: 'Get tasks list',
+                    msg: answerJSON.status+': '+answerJSON.statusText
+                });
                 if ($.isFunction(callback)) callback(result);
                 return result;
             });
@@ -142,7 +161,11 @@ $(function() {
             })
             .fail(function(answerJSON) {
                 if(DebugMode) console.log('AJAX result: ', answerJSON);
-                notif({type: "error", position: "center", msg: 'Add task &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                showNoty({
+                    type: 'error',
+                    title: 'Add task',
+                    msg: answerJSON.status+': '+answerJSON.statusText
+                });
                 if ($.isFunction(callback)) callback(false);
                 return false;
             });
@@ -170,7 +193,11 @@ $(function() {
                     })
                     .fail(function(answerJSON) {
                         if(DebugMode) console.log('AJAX result: ', answerJSON);
-                        notif({type: "error", position: "center", msg: 'Remove task &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                        showNoty({
+                            type: 'error',
+                            title: 'Remove task',
+                            msg: answerJSON.status+': '+answerJSON.statusText
+                        });
                         if ($.isFunction(callback)) callback(false);
                         return false;
                     });
@@ -204,7 +231,11 @@ $(function() {
             })
             .fail(function(answerJSON) {
                 if(DebugMode) console.log('AJAX result: ', answerJSON);
-                notif({type: "error", position: "center", msg: 'Get tasks list &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                showNoty({
+                    type: 'error',
+                    title: 'Get history list',
+                    msg: answerJSON.status+': '+answerJSON.statusText
+                });
                 if ($.isFunction(callback)) callback(result);
                 return result;
             });
@@ -217,12 +248,21 @@ $(function() {
             .done(function(answerJSON) {
                 if(DebugMode) console.log('AJAX result: ', answerJSON);
                 var msgType = (answerJSON.status == '1') ? "success" : "error";
-                notif({type: msgType, multiline: true, autohide: false, position: "center", msg: answerJSON.msg});
+                showNoty({
+                    type: msgType,
+                    title: 'Server test result',
+                    msg: answerJSON.msg,
+                    timeout: 0
+                });
                 return true;
             })
             .fail(function(answerJSON) {
                 if(DebugMode) console.log('AJAX result: ', answerJSON);
-                notif({type: "error", position: "center", msg: 'Server test &mdash; <strong>'+prc+'</strong> &mdash; '+answerJSON.status+': '+answerJSON.statusText});
+                showNoty({
+                    type: 'error',
+                    title: 'Server test',
+                    msg: answerJSON.status+': '+answerJSON.statusText
+                });
                 return false;
             });
     }
@@ -231,7 +271,7 @@ $(function() {
     
     /* return tasks list from GUI */
     function getTasksList() {
-        var tslist = root.find('div.task');
+        var tslist = taskList.find('div.task');
         if(tslist.length > 0) {
             var result = [];
             jQuery.each(tslist, function() {
@@ -256,13 +296,22 @@ $(function() {
         
         // Make fast check
         if((typeof fileUrl !== 'string') || (fileUrl == '')) {
-            notif({type: "warning", position: "center", msg: "Address cannot be empty"});
+            showNoty({
+                type: 'warning',
+                title: 'Check url',
+                msg: 'Address cannot be empty',
+            });
             return false;
         }
         
         // Notify is passed link - is not supported video link
         if(/http.?\:\/\/.*vk\.com\/video\d{1,11}_\d{1,15}$/i.test(fileUrl)) {
-            notif({type: "error", position: "center", msg: "This link format not supported, use this:<br /><br />https://vk.com/<b>video_ext.php</b>?oid=1&id=164841344&hash=c8de45fc73389353"});
+            showNoty({
+                type: 'warning',
+                title: 'This link format not supported, use this:',
+                msg: "<br />https://vk.com/<b>video_ext.php</b>?oid=1&id=164841344&hash=c8de45fc73389353",
+                timeout: 20000
+            });
             return false;
         }
         
@@ -321,16 +370,31 @@ $(function() {
                             addTaskGui({'url': result.url, 'progress': result.progress, 'id': result.id, 'name': result.saveAs});
                         } else
                             // or only show message
-                            notif({type: "warning", multiline: true, autohide: false, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
+                            showNoty({
+                                type: 'warning',
+                                title: 'Task "'+result.url+'" return message',
+                                msg: '<b>'+result.msg+'</b>',
+                                timeout: 20000
+                            });
                         // If it is last task in stack - make sync
                         if(result.isLast) syncTasksList();
                     } else {
                         // If returned error with correct message in answer
                         if((result !== false) && (typeof result.url === 'string') && (typeof result.msg === 'string'))
-                            notif({type: "error", multiline: true, time: 10000, position: "center", msg: 'Task "'+result.url+'" return message<br /><br /><b>'+result.msg+'</b>'});
+                            showNoty({
+                                type: 'error',
+                                title: 'Task "'+result.url+'" return message',
+                                msg: '<b>'+result.msg+'</b>',
+                                timeout: 20000
+                            });
                         // If all is bad =)
                         else
-                            notif({type: "error", multiline: true, position: "center", msg: 'Download not added, server error'});
+                            showNoty({
+                                type: 'error',
+                                title: 'Download not added',
+                                msg: 'Server error',
+                                timeout: 20000
+                            });
                     }
                 });
             }, 150 * i, taskData/* <--- pass settings object to timer */);
@@ -339,7 +403,11 @@ $(function() {
         
         // And for broken
         if(brokenUrls.length)
-            notif({type: "warning", multiline: true, position: "center", msg: 'Address \"<b>'+brokenUrls.join("</b>, <b>")+'</b>\" is not valid'});
+            showNoty({
+                type: 'warning',
+                title: 'Invalid Address',
+                msg: 'Address "<b>'+brokenUrls.join("</b>, <b>")+'</b>" is not valid'
+            });
     }
     
     function removeTask(taskID) {
@@ -348,7 +416,12 @@ $(function() {
                 removeTaskGui(taskID);
                 syncTasksList();
             } else {
-                notif({type: "error", multiline: true, position: "center", msg: '<strong>Download task not removed</strong><br />(ID'+taskID+', "'+msg+'")'});
+                showNoty({
+                    type: 'error',
+                    title: 'Download task not removed',
+                    msg: '(ID'+taskID+', "'+msg+'")',
+                    timeout: 0
+                });
             }
         });
     }
@@ -367,7 +440,7 @@ $(function() {
            Теперь, обладая всеми необходимыми данными для полноценной синхронизации - мы не актуальное - удаляем,
            а добавленное - отображаем. */
         getWgetTasksList(function(Tasks){
-            var guiTasks = root.find('div.task'),
+            var guiTasks = taskList.find('div.task'),
                 SyncedTasksIDs = [], AddedTasksIDs = [], RemovedTasksIDs = [],
                 GuiTasksIDs = [], RemoteTasksIDs = [],
                 duplicatesFounded = false;
@@ -385,7 +458,7 @@ $(function() {
                     }
                 }
             });
-            if(duplicatesFounded) guiTasks = root.find('div.task'); // Refresh
+            if(duplicatesFounded) guiTasks = taskList.find('div.task'); // Refresh
             
             jQuery.each(Tasks, function() {
                 var wgetTask = this;
@@ -483,11 +556,11 @@ $(function() {
             case 'bar-only':
                 body.removeClass("active-tasks");
                 pageTitle.text(titleText);
-                favicon.attr("href","img/favicon.png");
+                favicon.attr("href","gui/img/favicon.png");
                 break;
             case 'active-tasks':
                 body.addClass("active-tasks");
-                favicon.attr("href","img/favicon_active.png");
+                favicon.attr("href","gui/img/favicon_active.png");
                 break;
         }
         return true;
@@ -557,8 +630,8 @@ $(function() {
                        '</td></table>'+
                    '</div>';
                    
-        root.append(html);
-        var taskObj = root.find('div.task').last();
+        taskList.append(html);
+        var taskObj = taskList.find('div.task.id'+taskID).last();
         taskObj
             .css({opacity: 0})
             .data('info', {
@@ -579,7 +652,12 @@ $(function() {
     function changeF5event(e) {
         if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) {
             syncTasksList();
-            notif({msg: "Data updated", position: "center", time: 1000, width: 150, opacity: 0.8});
+            showNoty({
+                type: 'info',
+                title: 'Data updated',
+                showTime: true,
+                timeout: 2000
+            });
             e.preventDefault();
         }
     };
@@ -654,7 +732,7 @@ $(function() {
         });
     
     // Print version to any gui element with class 'projectCurrentVersion'
-    if(wgetGuiCurrentVersion !== false) $('.projectCurrentVersion').text(wgetGuiCurrentVersion);
+    $('.projectCurrentVersion').text(WGET_GUI_LIGHT_VERSION);
     
     // Enable feature 'Quick download bookmark'
     if(($.urlParam('action') == 'add')){
@@ -664,7 +742,12 @@ $(function() {
     $("#bookmark")
         .attr("href", "javascript:window.open('"+document.URL+"?action=add&url='+window.location.toString());void 0;")
         .on('click', function(){
-            notif({msg: "Move me to your <b>bookmarks bar</b>, don't click here :)", position: "center", time: 5000, opacity: 0.8});
+            showNoty({
+                type: 'info',
+                title: 'Bookmark',
+                msg: 'Move me to your <b>bookmarks bar</b>, don\'t click here :)',
+                timeout: 5000
+            });
             return false;
         });
     
@@ -718,13 +801,12 @@ $(function() {
             // <http://rawgit.com/>
             try { // TODO: Comment while testing
                 $.getScript('https://rawgit.com/tarampampam/wget-gui-light/master/lastversion.js', function(){
-                    // Check returned value in script. and local (declared in 'version.js')
+                    // Check returned value in script. and local (declared in 'settings.php')
                     if((typeof web_wgetguilight !== 'undefined') && (typeof web_wgetguilight.version === 'string') &&
-                       (web_wgetguilight.version !== '') && (typeof wgetGuiCurrentVersion === 'string') &&
-                       wgetGuiCurrentVersion.length > 3) {
+                       (web_wgetguilight.version !== '')) {
                         // Compare local and web versions
                         // If web version is newest then local
-                        if(versionCompare(wgetGuiCurrentVersion, web_wgetguilight.version) < 0) {
+                        if(versionCompare(WGET_GUI_LIGHT_VERSION, web_wgetguilight.version) < 0) {
                             var webVer = web_wgetguilight;
                             menu.find('.bottom').last().append('<br /><a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank" style="white-space:nowrap; text-overflow:clip; overflow:hidden; font-size:80%; font-family:Tahoma,Verdana,Arial; opacity:1;">Update available</a>');//
                             var updateLink = $('#updateAvailable'), 
@@ -732,29 +814,29 @@ $(function() {
                             // Animate showing notification link
                             updateLink.css({width: 0}).animate({width: updateLinkOrigWidth}, 1000);
                             // Load popup script <http://dinbror.dk/bpopup/>
-                            $.getScript('js/jquery.bpopup/jquery.bpopup.min.js', function(){
+                            $.getScript('gui/js/jquery.bpopup/jquery.bpopup.min.js', function(){
                                 // Load css
                                 $('<link>')
-                                    .appendTo(head)
                                     .attr({type : 'text/css', rel : 'stylesheet'})
-                                    .attr('href', 'js/jquery.bpopup/jquery.bpopup.css?rnd='+getRandomInt(0,2047)); // disable caching
+                                    .attr('href', 'gui/js/jquery.bpopup/jquery.bpopup.css?rnd='+getRandomInt(0,2047)) // disable caching
+                                    .appendTo(head);
                                 // Create popup container details
                                 body.append('<div id="updateDetails" style="display:none">'+
                                                 '<span class="button popupClose">'+
                                                     '<span>X</span>'+
                                                 '</span>'+
                                                 '<h2 class="name">'+webVer.name+'</h2>'+
-                                                '<h3 class="curentver">Current version: '+wgetGuiCurrentVersion+'</h3>'+
+                                                '<h3 class="curentver">Current version: '+WGET_GUI_LIGHT_VERSION+'</h3>'+
                                                 '<h3 class="availablever">Available version: <strong>'+webVer.version+'</strong></h3>'+
                                                 '<p class="desc">'+webVer.lastUpdate.shortDesc+' // <a href="'+webVer.lastUpdate.fullDescUrl+'" target="_blank">Full text</a></p>'+
                                                 '<div class="links">'+
-                                                    '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="img/dl-watch-detalies.svg" width="64" height="64" /><br />Info page</a>'+
-                                                    '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="img/dl-package.svg" width="64" height="64" /><br />Package</a>'+
+                                                    '<a class="page" href="'+webVer.download.page+'" target="_blank"><img alt="Page" src="gui/img/dl-watch-detalies.svg" width="64" height="64" /><br />Info page</a>'+
+                                                    '<a class="dl" href="'+webVer.download.file+'"><img alt="Download" src="gui/img/dl-package.svg" width="64" height="64" /><br />Package</a>'+
                                                     '<div class="clear"></a>'+
                                                 '</div>'+
                                                 '<p class="disable">'+
                                                     '<a href="#" id="disableUpdateCheck">Disable updates checking</a>'+
-                                                    '<span>Setting will stored in cookies</span>'+
+                                                    '<span>This setting will stored in cookies</span>'+
                                                 '</p>'+
                                             '</div>');
                                 // Attach event to notification link
@@ -774,7 +856,12 @@ $(function() {
                                     // Disable update check for a N days (SET cookie value)
                                     if(typeof $.cookie !== 'undefined') {
                                         $.cookie('DoNotCheckUpdate', 'true', {expires : 93});
-                                        notif({type: "warning", msg: "Disabled", position: "center", time: 1000, width: 150, opacity: 0.8});
+                                        showNoty({
+                                            type: 'warning',
+                                            title: 'Check Update',
+                                            msg: 'Disabled',
+                                            timeout: 3000
+                                        });
                                     }
                                     return false;
                                 });
