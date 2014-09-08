@@ -275,10 +275,11 @@ function bash($cmd, $result_type = '') {
  * @return (bool)
  */
 function validatePid($pid) {
-    // 32768 is maximum pid by default
+    // 32768 is maximum pid for 32bit system
+    // 4194304 (2^22) is maximum pid for 64bit system
     return (is_numeric($pid) &&
            ($pid > 0) &&
-           ($pid <= 32768)) ? true : false;
+           ($pid <= 4194304)) ? true : false;
 }
 
 /**
@@ -325,9 +326,27 @@ function makeUrlSafe($str) {
 function getWgetTasksList($string = '') {
     log::debug('(call) getWgetTasksList() called, $string='.var_export($string, true));
     $result = array();
-    // For BSD 'ps axwwo pid,args'
+    // For BSD 'ps -axwwo pid,args'
+    // For Linux 'ps -ewwo pid,args'
     // Issue <https://github.com/tarampampam/wget-gui-light/issues/8>
     // Thx to @ghospich <https://github.com/ghospich>
+    $os = php_uname('s');
+    if(isset($os) && !empty($os)) {
+        if(stripos($os, 'bsd') !== false) {
+            $cmd = ps.' -axwwo pid,args';
+            log::debug('FreeBSD detected, $os='.var_export($os, true).', $cmd='.var_export($cmd, true));
+        }
+        if(stripos($os, 'linux') !== false) {
+            $cmd = ps.' -ewwo pid,args';
+            log::debug('Linux detected, $os='.var_export($os, true).', $cmd='.var_export($cmd, true));
+        }
+    }
+    
+    if(!isset($cmd) || empty($cmd)) {
+        log::error('\'ps\' command not setted, os not supported, $os='.var_export($os, true));
+        die('{"status":0,"msg":"OS not supported, write to developer\'s team about this, please '.$os.' '.$cmd.'"}');
+    }
+    
     $tasks = bash(ps.' -ewwo pid,args', 'array');
     $string = empty($string) ? ' ' : (string) $string;
     
@@ -337,7 +356,7 @@ function getWgetTasksList($string = '') {
         // make FAST search:
         // find string with 'wget' and without '2>&1'
         if((strpos($task, 'wget') !== false) && (strpos($task, $string) !== false)) {
-            preg_match("/(\d{1,5})\swget.*--output-file=(\/.*\d{3,6}\.log\.tmp)(.*)".wget_secret_flag."\s(.*)/i", $task, $founded);
+            preg_match("/(\d{2,7})\swget.*--output-file=(\/.*\d{3,6}\.log\.tmp)(.*)".wget_secret_flag."\s(.*)/i", $task, $founded);
             //var_dump($task); var_dump($founded);
             $pid = @$founded[1]; $logfile = @$founded[2]; $etcParams = @$founded[3]; $url = @$founded[4];
             if(validatePid($pid)) {
@@ -722,7 +741,7 @@ function addWgetTask($url, $saveAs) {
     
     usleep(100000); // 1/10 sec
     
-    preg_match("/(\d{2,5})/i", $task, $founded);
+    preg_match("/(\d{2,7})/i", $task, $founded);
     $parentPid = @$founded[1];
     if(!validatePid($parentPid)) {
         log::error('Parent PID '.var_export($parentPid, true).' for task '.var_export($url, true).' not valid');
@@ -848,7 +867,7 @@ function echoResult($data, $type) {
 $result = array('status' => -1, 'msg' => 'No input data');
 
 // Command line support
-if(isset($argv)) {
+if(isset($argv) && (count($_GET) === 0) && (count($_POST) === 0)) {
     log::debug('(ext) Command line run detected, $argv='.var_export($argv, true));
     if(isset($argv[1]) && !empty($argv[1])) {
         @$_GET['action'] = $argv[1];
