@@ -2,7 +2,7 @@
 
 ## @author    Samoylov Nikolay
 ## @project   Wget GUI Light
-## @copyright 2014 <samoylovnn@gmail.com>
+## @copyright 2014 <samoylovnn {d0g} gmail {d0t} com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
 ## @version   Look in 'settings.php'
