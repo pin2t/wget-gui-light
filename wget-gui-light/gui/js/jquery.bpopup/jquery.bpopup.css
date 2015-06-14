@@ -1,123 +1,129 @@
 @charset 'utf-8';
 
 #updateDetails {
-    background-color: #fff;
-    color: #333;
-    border-radius: 3px;
-    width: 250px;
-    min-height: 140px;
-    padding: 25px;
+  background-color: #fff;
+  color: #333;
+  border-radius: 3px;
+  width: 250px;
+  min-height: 140px;
+  padding: 25px;
 	-webkit-box-shadow: 0 10px 6px -6px #777;
 	   -moz-box-shadow: 0 10px 6px -6px #777;
-	        box-shadow: 0 10px 6px -6px #777;
+	    box-shadow: 0 10px 6px -6px #777;
 }
 
-    #updateDetails .button.popupClose {
-        position: absolute;
-        right: 0px; top: 0px;
-        border-radius: 3px;
-        box-shadow: none;
-        text-align: center;
-        font-family: Tahoma, Arial, Verdana;
-        color: #fff;
-        text-decoration: none;
-        padding: 2px 8px 3px 8px; margin: 1px;
-        background-color: #bbb;
-        cursor: pointer;
-        opacity: .5;
-        transition: all .2s ease;
+  #updateDetails .button.popupClose {
+    position: absolute;
+    right: 0px; top: 0px;
+    border-radius: 3px;
+    box-shadow: none;
+    text-align: center;
+    font-family: Tahoma, Arial, Verdana;
+    color: #fff;
+    text-decoration: none;
+    padding: 2px 8px 3px 8px; margin: 1px;
+    background-color: #bbb;
+    cursor: pointer;
+    opacity: .5;
+    transition: all .2s ease;
+  }
+    #updateDetails .button.popupClose:hover {
+      opacity: 1;
     }
-        #updateDetails .button.popupClose:hover {
-            opacity: 1;
-        }
-        
-    #updateDetails h2.name {
-        font-family: Georgia, Times, 'Times new roman';
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
+    
+  #updateDetails h2.name {
+    font-family: Georgia, Times, 'Times new roman';
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  #updateDetails h3 {
+    font-family: Georgia, Times, 'Times new roman';
+    text-align: center;
+    font-size: 15px;
+  }
+  #updateDetails h3.curentver {
+    font-weight: normal;
+    font-size: 13px;
+    padding-bottom: 10px;
+  }
+  #updateDetails h3.availablever {
+    font-weight: normal;
+    font-size: 13px;
+    padding-bottom: 3px;
+  }
+    #updateDetails h3.availablever strong {
+      font-weight: bold;
+      font-size: 16px;
     }
-    #updateDetails h3 {
-        font-family: Georgia, Times, 'Times new roman';
-        text-align: center;
-        font-size: 15px;
-    }
-    #updateDetails h3.curentver {
-        font-weight: normal;
-        font-size: 13px;
-        padding-bottom: 10px;
-    }
-    #updateDetails h3.availablever {
-        font-weight: normal;
-        font-size: 13px;
-        padding-bottom: 3px;
-    }
-        #updateDetails h3.availablever strong {
-            font-weight: bold;
-            font-size: 16px;
-        }
 
-    #updateDetails p.desc {
-        font-family: Tahoma, Arial, Verdana;
-        text-align: center;
+  #updateDetails p.desc {
+    font-family: Tahoma, Arial, Verdana;
+    text-align: center;
+  }
+    #updateDetails p.desc a {
+      color: #111;
+      text-decoration: none;
     }
-        #updateDetails p.desc a {
-            color: #111;
-            text-decoration: none;
-        }
-            #updateDetails p.desc a:hover {
-                text-decoration: underline;
-            }
+      #updateDetails p.desc a:hover {
+        text-decoration: underline;
+      }
 
-    #updateDetails div.links {
-        text-align: center;
-        padding-top: 5px;
+  #updateDetails div.links {
+    text-align: center;
+    padding-top: 5px;
+  }
+    #updateDetails div.links a {
+      display: block;
+      margin: 25px 0;
+      
+      color: #000;
+      text-decoration: none;
+      
+      opacity: .75;
+      transition: all .15s ease;
     }
-        #updateDetails div.links a {
-            display: block;
-            margin: 25px 25px 0 25px;
-            
-            color: #000;
-            text-decoration: none;
-            
-            opacity: .75;
-            transition: all .15s ease;
-        }
-            #updateDetails div.links a:hover {
-                opacity: 1;
-            }
-            #updateDetails div.links a.page {
-                float: left;
-            }
-            #updateDetails div.links a.dl {
-                float: right;
-            }
-        #updateDetails div.clear {
-            clear: both;
-            height: 0;
-        }
-        
-    #updateDetails p.disable {
-        text-align: center;
-        opacity: .4;
-        transition: all .15s ease;
-        cursor: default;
+      #updateDetails div.links a:hover {
+        opacity: 1;
+      }
+      #updateDetails div.links a.page {
+        float: left;
+        width: 48%;
+      }
+      #updateDetails div.links a.dl {
+        float: right;
+        width: 48%;
+      }
+    #updateDetails div.clear {
+      clear: both;
+      height: 0;
     }
-        #updateDetails p.disable:hover {
-            opacity: 1;
-        }
-        #disableUpdateCheck {
-            display: block !important;
-            text-decoration: none !important;
-            font-size: 12px !important;
-            color: #000 !important;
-            opacity: 1 !important;
-        }
-            #disableUpdateCheck:hover {
-                text-decoration: underline !important;
-            }
-    #updateDetails p.disable span {
-        color: #777;
-        text-align: center;
-        font-size: 10px;
+    
+  #updateDetails p.disable {
+    text-align: center;
+    opacity: .4;
+    transition: all .15s ease;
+    cursor: default;
+  }
+    #updateDetails p.disable:hover {
+      opacity: 1;
     }
+    #disableUpdateCheck {
+      display: block !important;
+      text-decoration: none !important;
+      font-size: 12px !important;
+      color: #000 !important;
+      opacity: 1 !important;
+    }
+      #disableUpdateCheck:hover {
+        text-decoration: underline !important;
+      }
+  #updateDetails p.disable span {
+    color: #777;
+    text-align: center;
+    font-size: 10px;
+  }
+
+  #updateDetails .links .fa {
+    font-size: 620%;
+  }

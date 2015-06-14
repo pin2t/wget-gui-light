@@ -1,8 +1,8 @@
 var web_wgetguilight = {
-    "version": "0.1.5",
+    "version": "0.1.6",
     "name": "Wget GUI light",
     "lastUpdate": {
-        "shortDesc": "Some gui changes, all setting now in single file",
+        "shortDesc": "Added Russian locale, added feature for web-access to downloaded files, added downloaded files listing, and a lot of small fixes",
         "fullDescUrl": "https://github.com/tarampampam/wget-gui-light/blob/master/cahngeslog.md"
     },
     "download": {

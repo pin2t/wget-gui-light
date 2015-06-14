@@ -1,397 +1,392 @@
 @charset 'utf-8';
 
-html,body,div,span,h1,h2,h3,h4,h5,h6,p,blockquote,a,img,small,sub,b,dl,dd,dt,ul,li,
-label,article,details,footer,header,menu,nav,input,textarea,select {
-    background: transparent; border: 0;
-    outline: 0; padding: 0; margin: 0;
+/*
+  CSS Compressor - <http://csscompressor.com/>
+  ASCII Text generator - <http://patorjk.com/software/taag/#p=display&f=Small&t=Text>
+*/
+
+/*
+   ___ ___ ___   ___             _
+  / __/ __/ __| | _ \___ ___ ___| |_
+ | (__\__ \__ \ |   / -_|_-</ -_)  _|
+  \___|___/___/ |_|_\___/__/\___|\__| <Reset CSS v2.0 | License: none (public domain)>
+
+*/
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,
+big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,
+dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,
+canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,
+time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
+body{line-height:1;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+ol,ul{list-style:none}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}
+blockquote,q{quotes:none}
+table{border-collapse:collapse;border-spacing:0}
+.cf:after{content:"";display:table;clear:both}
+
+
+/*
+  ___ ___  _  _ _____ ___
+ | __/ _ \| \| |_   _/ __|
+ | _| (_) | .` | | | \__ \
+ |_| \___/|_|\_| |_| |___/
+ 
+*/
+@font-face {
+  font-family: 'Playfair Display'; font-style: normal; font-weight: 400;
+  src: local('Playfair Display'), local('PlayfairDisplay-Regular'),
+    url(../fonts/PlayfairDisplay-Regular.woff) format('woff');
+}
+@font-face {
+  font-family: 'Playfair Display'; font-style: normal; font-weight: 700;
+  src: local('Playfair Display Bold'), local('PlayfairDisplay-Bold'),
+    url(../fonts/PlayfairDisplay-Bold.woff) format('woff');
+}
+@font-face {
+  font-family: 'Playfair Display'; font-style: italic; font-weight: 400;
+  src: local('Playfair Display Italic'), local('PlayfairDisplay-Italic'),
+    url(../fonts/PlayfairDisplay-Italic.woff) format('woff');
+}
+@font-face {
+  font-family: 'Playfair Display'; font-style: italic; font-weight: 700;
+  src: local('Playfair Display Bold Italic'), local('PlayfairDisplay-BoldItalic'),
+    url(../fonts/PlayfairDisplay-BoldItalic.woff) format('woff');
 }
 
-.clear:after {
-    clear: both; content: ' '; display: block;
-    font-size: 0; line-height: 0; visibility: hidden;
-    width: 0; height: 0;
+
+/*
+   ___ _     _          _   ___ _        _
+  / __| |___| |__  __ _| | / __| |_ _  _| |___ ___
+ | (_ | / _ \ '_ \/ _` | | \__ \  _| || | / -_|_-<
+  \___|_\___/_.__/\__,_|_| |___/\__|\_, |_\___/__/
+                                    |__/
+*/
+.clear, .clear:after {
+  clear: both; content: ' '; display: block;font-size: 0; line-height: 0; visibility: hidden;
+  width: 0; height: 0;
 }
 
-.hidden, .hide {
-    display: none;
+.hidden, .hide {display: none;}
+
+html, body {
+  font-family: Arial, Tahoma, Sans-serif; font-size: 12px; height: 100%; width: 100%;
+  color: #333; background: #fff;
 }
 
-li {
-    list-style: none;
-}
 
-html,body {
-    font-family: 'Arial';
-    font-size: 12px;
-    height: 100%;
-    width: 100%;
-    color: #333;
-    background: #fff;
-}
+/*
+  __  __
+ |  \/  |___ _ _ _  _
+ | |\/| / -_) ' \ || |
+ |_|  |_\___|_||_\_,_|
 
-/* ----------------------------------------------------------------------------------- */
-
+*/
 #menu-button {
-    position: fixed;
-    font-size: 50px; font-family: verdana !important;
-    font-weight: normal !important; font-style: normal !important;
-    height: 50px; width: 50px;
-    left: 13px; top: 10px;
-    color: #ccc;
-    cursor: pointer;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    z-index: 11;
+  position: fixed; left: 1.6em; top: 1.6em; font-size: 1em; color: #ccc; cursor: pointer;
+  z-index: 11; -webkit-user-select: none; -moz-user-select: -moz-none; user-select: none;
 }
-    #menu-button span {
-        display: block; font-size: 20px;
-        color: #fff; opacity: .7;
-        margin: 11px 0 0 45px;
-    }
-    #menu-button:after {
-        content: '\2261'; color:#ccc;
-        position: absolute;
-        top:0.39em; left:0.036em; line-height: 0;
-    }
-    #menu-button:active {
-        left: 14px; top: 11px;
-    }
-#menu-button.open { display: block }
-#menu-button.close span {display: none }
+  #menu-button span {
+    position: relative; top: -0.3em; left: 0.4em; font-size: 1.6em; color: #fff; opacity: .7;
+    text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased;
+  }
+  #menu-button:active {
+    left: 1.65em; top: 1.65em;
+  }
+  #menu-button.open {display: block;}
+  #menu-button.close span {display: none;}
 
 #menu {
-    position: fixed;
-    left: 0;
-    height: 100%; width: 200px;
-    padding: 60px 30px 20px 20px;
-    background: #444;
-	-moz-transition: all 300ms;
-	-webkit-transition: all 300ms;
-	transition: all 300ms;
-    overflow: hidden;
-    z-index: 10;
-    transition: all 0.1s linear;
-    box-shadow: 6px 0px 22px 0px rgba(0, 0, 0, 0.22);
+  position: fixed; left: 0; height: 100%; width: 200px; padding: 60px 30px 20px 20px;
+  background: #444; overflow: hidden; -webkit-transition: all 300ms ease; transition: all 300ms ease;
+  color: #fff; box-shadow: 6px 0px 22px 0px rgba(0, 0, 0, 0.22); z-index: 10;
 }
-    #menu * { /* default fonts */
-        color: #fff;
-        text-decoration: none;
-    }
-        #menu ul li {
-            padding: 10px 0;
-            border: solid #555;
-            border-width: 0 0 1px 0;
-        }
-        #menu ul li:last-child, #menu ul li.last {
-            border-width: 0;
-        }
+  #menu a {
+    color: #fff; text-decoration: none;
+  }
     #menu a:hover {
-        text-decoration: underline;
+      text-decoration: underline;
     }
-    #menu h1, #menu h2, #menu h3, #menu h4, #menu h5, #menu h6 {
-        font-family: Georgia, Times, 'Times new roman';
-        font-weight: normal;
-        letter-spacing: 0.05em;
-        padding: 20px 0 5px 0;
+  #menu ul {}
+    #menu ul li {
+      padding: 10px 0; border: solid #555; border-width: 0 0 1px 0;
     }
-    #historyList {display: none}
-    #historyList ul li a.ok {}
-    #historyList ul li a.err {
-        color: #ffd8d8;
+    #menu ul li:last-child, #menu ul li.last {
+      border-width: 0;
     }
-    #menu .bottom {
-        position: absolute; bottom: 0;
-        padding: 5px 0 100px 0; width: 200px;
-        text-align: center; background: #444;
-        font-family: Georgia, Times, 'Times new roman';
+  #menu h1, #menu h2, #menu h3, #menu h4, #menu h5, #menu h6 {
+    font-family: 'Playfair Display', serif; font-weight: normal; letter-spacing: 0.05em;
+    padding: 20px 0 5px 0;
+  }
+  #menu .bottom {
+    position: absolute; bottom: 0; padding: 5px 0 100px 0; width: 200px; text-align: center;
+    background: #444; font-size: 1.2em; font-family: Georgia, Serif;
+  }
+    #updateAvailable {
+      padding:0.45em 1em 0.3em 1em; white-space:nowrap; text-decoration:underline !important;
+      text-overflow:clip; overflow:hidden; font-size:80%; font-family:Tahoma,Verdana,Arial;
     }
-#menu.open  { left: 0;      box-shadow: 6px 0px 22px 0px rgba(0, 0, 0, 0.22); }
-#menu.close { left: -250px; box-shadow: none; }
+#menu.open  {left: 0; box-shadow: 6px 0px 22px 0px rgba(0, 0, 0, 0.22);}
+#menu.close {left: -250px; box-shadow: none;}
 
-/* ----------------------------------------------------------------------------------- */
 
+/*
+  _  _ _    _                _    _    _
+ | || (_)__| |_ ___ _ _ _  _| |  (_)__| |_
+ | __ | (_-<  _/ _ \ '_| || | |__| (_-<  _|
+ |_||_|_/__/\__\___/_|  \_, |____|_/__/\__|
+                        |__/
+*/
+#historyList {
+  display: none; font-family: Georgia, Serif; text-align: center; margin-top: 20px;
+}
+  #historyList h2 {
+    font-weight: 100; color: #aaa; font-size: 1.6em; margin-bottom: 0.2em;
+  }
+  #historyList a {
+    font-family: Tahoma, Sans-serif; color: #999;
+  }
+    #historyList a:hover {color: #333}
+    #historyList a i.fa {padding-right: 0.35em}
+  #historyList ul li {
+    padding: 0.15em 0; color: #999;
+  }
+  #historyList .external {
+    font-size: 0.8em; opacity: 0.7;
+  }
+  #historyList ul li a.ok {}
+  #historyList ul li a.err {
+    color: #ffd8d8;
+  }
+
+
+/*
+  ___                  _              _        _ ___ _ _        _    _    _
+ |   \ _____ __ ___ _ | |___  __ _ __| |___ __| | __(_) |___ __| |  (_)__| |_
+ | |) / _ \ V  V / ' \| / _ \/ _` / _` / -_) _` | _|| | / -_|_-< |__| (_-<  _|
+ |___/\___/\_/\_/|_||_|_\___/\__,_\__,_\___\__,_|_| |_|_\___/__/____|_/__/\__|
+
+*/
+#downloadedFilesList {
+  display: none; /* <-- change this by JS */ 
+  text-align: left; overflow-y: scroll; overflow-x: hidden; height: 75%;
+}
+  #downloadedFilesList::-webkit-scrollbar-track {
+    -webkit-box-shadow: transparent; background-color: transparent;
+  }
+  #downloadedFilesList::-webkit-scrollbar {
+    width: 10px; background-color: transparent;
+  }
+  #downloadedFilesList::-webkit-scrollbar-thumb {
+    border-radius: 10px; -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3); background-color: #666;
+  }
+
+  #downloadedFilesList h2 {font-size: 1.4em; padding: 0.4em 0 0.6em 0;}
+  #downloadedFilesList ul {color: #fff; padding-right: 0.6em;}
+    #downloadedFilesList ul li i.fa {padding-right: 0.35em;}
+    #downloadedFilesList ul li {
+      padding-left: 0.5em; padding-top: 0.2em; padding-bottom: 0.2em;
+      line-height: 1.3em; list-style: none; border: none;
+    }
+    #downloadedFilesList ul li.file {font-weight: normal;}
+    #downloadedFilesList ul li.dir {font-weight: bold; border: solid #666; border-width: 0 0 0 0.2em; margin: 0.3em 0 0.3em 0.5em; padding: 0}
+    #downloadedFilesList ul li.dir span {font-weight: bold; width: 100%; display: inline-block; margin-bottom: 0.3em; padding: 0.4em 0 0.2em 0.3em; background: -moz-linear-gradient(left,  rgba(102,102,102,1) 0%, rgba(102,102,102,0) 100%); background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(102,102,102,1)), color-stop(100%,rgba(102,102,102,0))); background: -webkit-linear-gradient(left,  rgba(102,102,102,1) 0%,rgba(102,102,102,0) 100%); background: -ms-linear-gradient(left,  rgba(102,102,102,1) 0%,rgba(102,102,102,0) 100%); background: linear-gradient(to right,  rgba(102,102,102,1) 0%,rgba(102,102,102,0) 100%);}
+
+
+/*
+  _   _     _   ___
+ | | | |_ _| | | _ ) __ _ _ _
+ | |_| | '_| | | _ \/ _` | '_|
+  \___/|_| |_| |___/\__,_|_|
+
+*/
 #urlbar {
-    background-color: #fff;
-    width: 90%;
-    height: 150px;
-    
-    text-align: center;
-    
-    position: absolute;
-    top: 48%; margin-top: -6.5%;
-    left: 50%; margin-left: -45%;
+  background-color: #fff; width: 90%; height: 150px; text-align: center; position: absolute;
+  top: 48%; margin-top: -6.5%; left: 50%; margin-left: -45%;
 }
+  #urlbar div.title {
+    font-family: 'Playfair Display', serif; font-size: 3em; margin: 0 0 10px 0; color: #999;
+  }
+  #inputData {
+    display: table; table-layout: fixed; position: relative; left: 16px; width: 100%;
+  }
+    #urlbar div.left, #urlbar div.right {
+      display: table-cell; vertical-align: top;
+    }
+    #urlbar div.left {text-align: left}
+    #urlbar div.right {text-align: left; width: 140px}
 
-    #urlbar div.title {
-        font-family: Georgia, Times, 'Times new roman';
-        font-size: 3em;
-        margin: 0 0 10px 0;
-        color: #999;
+  #addTaskAddr {
+    border: 1px solid #c1c1c1; border-radius: 2px; background-color: #fff; color: #444;
+    font-size: 1em; font-family: Tahoma, Verdana, Sans-serif; position: relative;
+    padding: 8px 6px; left: -12px; resize: vertical; max-height: 115px; width: 100%;
+  }
+    #addTaskAddr:focus {border-color: #4285f4}
+
+  #urlbar input[type='button'] {
+    border: 1px solid #d9d9d9; border-radius: 2px; background-color: #f2f2f2; color: #444; 
+    font-size: 12px; font-family: Tahoma, Sans-serif; font-weight: bold; padding: 8px;
+    margin: 0 0 0 6px; width: 120px;
+  }
+    #urlbar input[type='button']:hover {
+      border-color: #c6c6c6;
+      box-shadow: 0px 1px 0px 0px rgba(50, 50, 50, 0.2);
     }
 
-    #inputData {
-        display: table;
-        table-layout: fixed;
-        position: relative;
-        left: 16px;
-        width: 100%;
+  #taskExtended {
+    padding: 5px 0; color: #444; cursor: default; font-size: 9px; opacity: .8;
+    transition: all .2s ease;
+  }
+    #taskExtended:hover {opacity: 1}
+    #taskExtended .b {
+      border: solid #c1c1c1; border-width: 1px 1px 2px 1px; border-radius: 4px; padding: 1px 4px;
+      background-color: #fff; color: #666; font-family: Tahoma, Verdana, Sans-serif;
     }
-        #urlbar div.left, #urlbar div.right {
-            display: table-cell;
-            vertical-align: top;
-        }
-        #urlbar div.left {
-            text-align: left;
-            /*background-color:green;*/
-            
-        }
-        #urlbar div.right {
-            text-align: left;
-            width: 140px;
-            /*background-color:blue;*/
-        }
-    
-    #addTaskAddr {
-        border: 1px solid #c1c1c1;
-        border-radius: 2px;
-        
-        background-color: #fff;
-        color: #444;
-        
-        font-size: 14px;
-        font-family: Georgia, Times, 'Times new roman';
-        
-        position: relative;
-        padding: 7px; left: -12px;
-        resize: vertical; max-height: 200px;
-        
-        width: 100%;
+    #taskExtended .s {
+      border: 1px solid #c1c1c1; border-radius: 4px; padding: 1px 4px; background-color: #fff;
+      color: #222; font-family: Tahoma, Sans-serif;
     }
-        #addTaskAddr:focus {
-            border-color: #4285f4;
-        }
 
-    #urlbar input[type='button'] {
-        border: 1px solid #d9d9d9;
-        border-radius: 2px;
-        
-        background-color: #f2f2f2;
-        color: #444;
-        
-        font-size: 12px;
-        font-family: Tahoma, Arial, Verdana;
-        font-weight: bold;
-        padding: 8px;
-        margin: 0 0 0 6px;
-        
-        width: 120px;
-    }
-        #urlbar input[type='button']:hover {
-            border-color: #c6c6c6;
-            box-shadow: 0px 1px 0px 0px rgba(50, 50, 50, 0.2);
-        }
 
-        
-    #taskExtended {
-        padding: 5px 0;
-        color: #444;
-        cursor: default;
-        font-size: 9px;
-        opacity: .8;
-        transition: all .2s ease;
-    }
-        #taskExtended:hover {
-            opacity: 1;
-        }
-        #taskExtended .b {
-            border: solid #c1c1c1;
-            border-width: 1px 1px 2px 1px;
-            border-radius: 4px;
-            
-            padding: 1px 4px;
-            background-color: #fff;
-            
-            color: #666;
-            font-family: Georgia, Times, 'Times new roman';
-        }
-        #taskExtended .s {
-            border: 1px solid #c1c1c1;
-            border-radius: 4px;
-            
-            padding: 1px 4px;
-            background-color: #fff;
-            
-            color: #222;
-            font-family: Tahoma, Arial, Verdana;
-        }
-        
-        
+/*
+  _____        _     _    _    _
+ |_   _|_ _ __| |__ | |  (_)__| |_
+   | |/ _` (_-< / / | |__| (_-<  _|
+   |_|\__,_/__/_\_\ |____|_/__/\__|
+
+*/
 #tasklist {
-    display: none;
+  display: none; /* <-- change this by JS */ text-align: center;
 }
-        
-/* ----------------------------------------------------------------------------------- */
-
-#tasklist {
-    text-align: center;
-}
-    #tasklist .task {
-        text-align: center;
+  #tasklist .task {text-align: center}
+    #tasklist .task table {
+      margin: 0 auto; width: 80%; height: 55px; border-spacing: 0; border-collapse: collapse;
     }
-        #tasklist .task table {
-            margin: 0 auto;
-            width: 80%; height: 55px;
-            border-spacing: 0;
-            border-collapse: collapse;
-        }
-            #tasklist .task table tr td { 
-                /*border: 1px solid #123;*/
-                
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            #tasklist .task table .name {
-                width: 25%; max-width: 100px;
-                text-align: left;
-                font-size: 16px;
-                font-family: Georgia, Times, 'Times new roman';
-                overflow: hidden;
-            }
-                #tasklist .task table .name a {
-                    text-decoration: none;
-                    color: #333;
-                }
-                    #tasklist .task table .name a:hover {
-                        text-decoration: underline;
-                    }
-            #tasklist .task table .progress {
-                width: auto;
-            }
-            #tasklist .task table .actions {
-                width: 40px; min-width: 40px;
-            }
-                #tasklist .task table .actions *:first-child {
-                    margin-left: 40px;
-                }
-            
-        #tasklist .task table:hover .id {
-            /*color: #666;*/
+      #tasklist .task table tr td { 
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      #tasklist .task table .name {
+        width: 25%; max-width: 100px; text-align: left; font-size: 1.3em; overflow: hidden;
+        font-family: 'Playfair Display', serif;
+      }
+        #tasklist .task table .name a {text-decoration: none; color: #333;}
+          #tasklist .task table .name a:hover {text-decoration: underline;}
+      #tasklist .task table .progress {
+        position: relative; width: auto; top: -5px;
+      }
+      #tasklist .task table .actions {
+        width: 40px; min-width: 40px;
+      }
+        #tasklist .task table .actions *:first-child {
+          margin-left: 40px;
         }
 
-        #tasklist .task .button {
-            position: relative;
-            background-color: #f2f2f2;
-            border: 1px solid #d9d9d9;
-            border-radius: 25px;
-            color: #444;
-            height: 24px;
-            padding: 0 15px;
-            cursor: pointer;
-        }
-            #tasklist .task .button:hover {
-                border-color: #c6c6c6;
-                box-shadow: 0px 1px 0px 0px rgba(50, 50, 50, 0.2);
-            }
-            #tasklist .task .button:active {
-                top: 1px;
-                box-shadow: 0px 0px 0px 0px rgba(50, 50, 50, 0.2);
-            }
-        
-        
-        #tasklist .task .red-hover, #tasklist .task .blue-hover, #tasklist .task .green-hover {
-            background-color: #fff;
-            border-color: #fff;
-            /*transition: all .05s ease;*/
-        }
-            #tasklist .task .red-hover:hover {
-                background-color: #e55;
-                border-color: #f99;
-                color: #fff;
-            }
-            #tasklist .task .blue-hover:hover {
-                background-color: #44e;
-                border-color: #99f;
-                color: #fff;
-            }
-            #tasklist .task .green-hover:hover {
-                background-color: #6c6;
-                border-color: #afa;
-                color: #fff;
-            }
+    #tasklist .task .button {
+      position: relative; background-color: #f2f2f2; border: 1px solid #d9d9d9; color: #444;
+      border-radius: 25px; height: 24px; padding: 0 15px; cursor: pointer; outline: none;
+      -webkit-transition: all 0.1s ease-in-out; transition: all 0.1s ease-in-out; 
+    }
+      #tasklist .task .button:hover {
+        border-color: #c6c6c6; box-shadow: 0px 1px 0px 0px rgba(50, 50, 50, 0.2);
+      }
+      #tasklist .task .button:active {
+        top: 1px; outline: none;
+      }
+
+    #tasklist .task .red-hover, #tasklist .task .blue-hover, #tasklist .task .green-hover {
+      background-color: #fff; border-color: #fff;
+    }
+      #tasklist .task .red-hover:hover {
+        background-color: #e55; border-color: #f99; color: #fff;
+      }
+      #tasklist .task .blue-hover:hover {
+        background-color: #44e; border-color: #99f; color: #fff;
+      }
+      #tasklist .task .green-hover:hover {
+        background-color: #6c6; border-color: #afa; color: #fff;
+      }
 
 
-/* ----------------------------------------------------------------------------------- */
-/* ext */
+/*
+  ___                            ___     _               _
+ | _ )_ _ _____ __ _____ ___ _ _| __|_ _| |_ ___ _ _  __(_)___ _ _
+ | _ \ '_/ _ \ V  V (_-</ -_) '_| _|\ \ /  _/ -_) ' \(_-< / _ \ ' \
+ |___/_| \___/\_/\_//__/\___|_| |___/_\_\\__\___|_||_/__/_\___/_||_|
 
+*/
 #browserExtension.chrome:hover {}
 #browserExtension.firefox:hover {}
 
-/* ----------------------------------------------------------------------------------- */
-   
+
+/*
+  _ _         _   _             _           _       _ _                 _
+ ( | )__ _ __| |_(_)_ _____ ___| |_ __ _ __| |__ __( | )  _ __  ___  __| |___
+  V V/ _` / _|  _| \ V / -_)___|  _/ _` (_-< / /(_-<V V  | '  \/ _ \/ _` / -_)
+     \__,_\__|\__|_|\_/\___|    \__\__,_/__/_\_\/__/     |_|_|_\___/\__,_\___|
+
+*/
 body.active-tasks #urlbar {
-    height: auto;
-    
-    position: static;
-    
-    top: auto; left: auto;
-    margin: 0 auto; padding: 20px 0 30px 0;
+  height: auto; position: static; top: auto; left: auto; margin: 0 auto; padding: 20px 0 30px 0;
 }
-
 body.active-tasks #tasklist {
-    display: block;
+  display: block;
 }
 
-/* ----------------------------------------------------------------------------------- */
 
+/*
+  ___                          _
+ | _ \___ ____ __  ___ _ _  __(_)_ _____
+ |   / -_|_-< '_ \/ _ \ ' \(_-< \ V / -_)
+ |_|_\___/__/ .__/\___/_||_/__/_|\_/\___|
+            |_|
+*/
 @media only screen and (max-width: 479px) {
-    #urlbar div.title {
-        font-size: 2em;
+  #urlbar div.title {
+    font-size: 2em;
+  }
+  #urlbar {
+    top: 43%;
+  }
+  #urlbar input[type='button'] {
+    margin: 5px 0 0 2px;
+    width: 35%;
+  }
+  
+  #inputData {
+    display: block;
+    left: 0;
+  }
+    #urlbar div.left, #urlbar div.right {
+      display: block;
+      width: auto;
     }
-    #urlbar {
-        top: 43%;
+    #urlbar div.left {
+      text-align: center;
     }
-    #urlbar input[type='button'] {
-        margin: 5px 0 0 2px;
-        width: 35%;
-    }
-    
-    #inputData {
-        display: block;
+      #addTaskAddr {
+        width: 88%;
         left: 0;
+      }
+    #urlbar div.right {
+      text-align: center;
     }
-        #urlbar div.left, #urlbar div.right {
-            display: block;
-            width: auto;
-        }
-        #urlbar div.left {
-            text-align: center;
-        }
-            #addTaskAddr {
-                width: 88%;
-                left: 0;
-            }
-        #urlbar div.right {
-            text-align: center;
-        }
-    
+  
 
-    #taskExtended {
-        display: none !important;
-    }
-    
-    #tasklist .task table tr {
-        display: block;
-        width: 100%;
-        margin-bottom: 30px;
-    }
-    #tasklist .task table tr td {
-        display: block;
-        width: 98% !important; min-width: 98%; max-width: 98%; 
-        /*border: 1px solid #123;*/
-    }
-    #tasklist .task table .actions *:first-child {
-        margin-left: 0;
-    }
+  #taskExtended {
+    display: none !important;
+  }
+  
+  #tasklist .task table tr {
+    display: block;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+  #tasklist .task table tr td {
+    display: block;
+    width: 98% !important; min-width: 98%; max-width: 98%; 
+    /*border: 1px solid #123;*/
+  }
+  #tasklist .task table .actions *:first-child {
+    margin-left: 0;
+  }
 }

@@ -1,14 +1,38 @@
 Как обновить мою версию Wget GUI Light?
 =========
 
- 1. Перейти в директорию, где установлен "**Wget GUI Light**" (`cd \var\www\`);
- 2. Сделать копию директории, в которой в данный момент установлен "Wget GUI Light", очистив содержимое оригинальной (`mv ./wget-gui/ ./wget-gui-backup/; mkdir ./wget-gui/` или `cp -R ./wget-gui/ ./wget-gui-backup/; rm -R ./wget-gui/*`);
- 3. Скачать [крайнюю версию](https://github.com/tarampampam/wget-gui-light/archive/master.zip) (`wget -O master.zip http://goo.gl/Glxyfo`);
- 4. Распаковать архив в текущую директорию (`unzip master.zip`);
- 5. Скопировать содержимое директории `/wget-gui-light-master/wget-gui-light/*` в директорию, где ранее был установлен "Wget GUI Light" (`cp -R ./wget-gui-light-master/wget-gui-light/* ./wget-gui/`);
- 6. Внести необходимые изменения в секции настроек файлов `./wget-gui/rpc.php` и `./wget-gui/core.js` (предыдущие значения можно подсмотреть в сохраненной копии по пути `./wget-gui-backup/`);
- 7. Проверить работоспособность путем открытия в браузере (если сразу не заработает - в строке добавления закачки ввести `test` и проанализировать вывод);
- 8. **После** завершения всех настроек и проверок - удалить директории `./wget-gui-backup/`, `./wget-gui-light-master/` и файл `./master.zip` (`rm -R ./wget-gui-backup/; rm -R ./wget-gui-light-master/; rm  ./master.zip`) 
+* Перейти в директорию, где установлен "**Wget GUI Light**":
+```shell
+cd \var\www\
+```
+* Сделать копию директории, в которой в данный момент установлен "Wget GUI Light", очистив содержимое оригинальной директории:
+```shell
+mv ./wget-gui/ ./wget-gui-backup/
+mkdir ./wget-gui/
+## --- или ---
+cp -R ./wget-gui/ ./wget-gui-backup/
+rm -R ./wget-gui/*
+```
+* Скачать [крайнюю версию](https://github.com/tarampampam/wget-gui-light/archive/master.zip) 
+```shell
+wget -O master.zip http://goo.gl/Glxyfo
+```
+* Распаковать архив в текущую директорию
+```shell
+unzip master.zip
+```
+* Скопировать содержимое директории `/wget-gui-light-master/wget-gui-light/*` в директорию, где ранее был установлен "Wget GUI Light"
+```shell
+cp -R ./wget-gui-light-master/wget-gui-light/* ./wget-gui/
+```
+* Внести необходимые изменения файл настроек `./wget-gui/settings.php`  (предыдущие значения можно подсмотреть в сохраненной копии по пути `./wget-gui-backup/`)
+* Проверить работоспособность путем открытия в браузере (если сразу не заработает - в строке добавления закачки ввести `test` и проанализировать вывод)
+* **После** завершения всех настроек и проверок - удалить директории `./wget-gui-backup/`, `./wget-gui-light-master/` и файл `./master.zip`
+```shell
+rm -R ./wget-gui-backup/
+rm -R ./wget-gui-light-master/
+rm  ./master.zip
+```
 
 ##### Для новой установки проделать все пункты, кроме второго.
 
