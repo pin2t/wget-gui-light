@@ -22,12 +22,12 @@
 #
 
 ## Project version
-define('WGET_GUI_LIGHT_VERSION', '0.1.6');
+define('WGET_GUI_LIGHT_VERSION', '0.1.7');
 
 ## Add debug info to log-file (and maybe some output) + a lot of info in gui
 ##    console (used 'console.log') . Comment this line or set 'false' for
 ##    disable this feature
-define('DEBUG_MODE', false);
+//define('DEBUG_MODE', true);
 
 ## Path to base directory (where this script located)
 ## > Without '/' at the end!
@@ -71,6 +71,9 @@ define('LOG_PATH', BASEPATH.'/log');
 ## 'get_LOG_HISTORY' action feature. Uncomment this line for enable this
 ## feature
 define('LOG_HISTORY', BASEPATH.'/log/history.log');
+
+## How many max history entries RPC will return by calling 'get_history'
+define('HISTORY_LENGTH', 5);
 
 ## Set maximum tasks count in one time. Comment this line for disable this
 ## feature
@@ -159,7 +162,7 @@ if(!defined('WGET_GUI_LIGHT_VERSION'))
   array_push($e, sprintf($em['checkSetting'], 'WGET_GUI_LIGHT_VERSION'));
 elseif(floatval(WGET_GUI_LIGHT_VERSION) <= 0)
   array_push($e, sprintf($em['invalidSetting'], 'WGET_GUI_LIGHT_VERSION'));
-
+  
 if(!defined('BASEPATH'))
   array_push($e, sprintf($em['checkSetting'], 'BASEPATH'));
 elseif(!is_dir(BASEPATH))

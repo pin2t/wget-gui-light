@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.6/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.7/lightgrey.png)
 
 #### What is it? / Что это?
 
@@ -13,6 +13,8 @@ This is **web-interface for [wget]** - program for downloading files from networ
 
 * Русский (**Ru**)
 * English (**En**)
+* French (**FR**) (*Translator: [Florian M](http://flothegeek.fr/)*)
+* Deutsch (**DE**) (*Translator: [Olga Kleinknecht](http://spinachcandy.me/)*)
 
 #### Какие требования к системе?
 
@@ -55,6 +57,7 @@ define('параметр', 'значение');
 `TMP_PATH` | Путь для временных лог-файлов `wget`. Автоматически удаляются при завершении или прерывании задачи.<br />**Обязательный** параметр.<br />По умолчанию `'/tmp'`
 `LOG_PATH` | Директория для лог-файлов серверной части. Возможен режим записи разных типов сообщений в разные файлы (устанавливаются в константах класса `log`). По умолчанию запись всех сообщений происходит в файл `wgetgui.log`.<br />По умолчанию `BASEPATH.'/log'`
 `LOG_HISTORY` | Вести запись истории задач. Так же отображается в GUI.<br />По умолчанию `BASEPATH.'/log/history.log'`
+`HISTORY_LENGTH` | Количество элементов истории, которое возвращается при запросе 'get_history'.<br />По умолчанию `5`
 `WGET_ONE_TIME_LIMIT` | Лимит на количество одновременно запущенных задач.<br />По умолчанию `10`
 `WGET_DOWNLOAD_LIMIT` | Ограничение скорости закачки `wget` в Кб/сек.<br />По умолчанию `2048`
 `WGET_SECRET_FLAG` | Параметр `wget`, дописываемый ко всем запускаемым задачам, для определения источника запуска. Без необходимости не надо его изменять.<br />**Обязательный** параметр.<br />По умолчанию `--max-redirect=4321`

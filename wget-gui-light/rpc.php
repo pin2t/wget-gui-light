@@ -348,7 +348,7 @@ function getFileDataForWebAccess($filename) {
  */
 function getFilesListInDirecrory($dir, $listDir = array()) {
   $listDir = array();
-  if($handler = opendir($dir)) {
+  if(($handler = opendir($dir)) && is_readable($dir)) {
     while(($sub = readdir($handler)) !== false) {
       if(!in_array(strtolower($sub), array('.', '..', '.htaccess', 'thumbs.db', 'desktop.ini', '.ds_store', '.tickle'))) {
         $absolute_filepath = $dir.'/'.$sub;
@@ -366,7 +366,10 @@ function getFilesListInDirecrory($dir, $listDir = array()) {
           $listDir[$fileData['name']] = $fileData; // Add file data to result array
         }
         if(is_dir($absolute_filepath)) {
-          $listDir[$sub] = getFilesListInDirecrory($absolute_filepath);
+          // Next line makes a check - directory is empty, or not?
+          if(is_readable($absolute_filepath) && (count(scandir($absolute_filepath)) > 2 /* '.' and '..' */)) {
+            $listDir[$sub] = getFilesListInDirecrory($absolute_filepath);
+          }
         } 
       } 
     }  
@@ -993,7 +996,6 @@ if(!empty($_GET['action'])) {
       $result['tasks'] = array();
       
       foreach (getWgetTasks() as $task) {
-        
         array_push($result['tasks'], array(
           'url'      => (string) $task['url'],
           'saveAs'   => (string) $task['saveAs'],
@@ -1046,7 +1048,7 @@ if(!empty($_GET['action'])) {
     ## Action - Get history
     #######################
     case 'get_history':
-      $itemsCount = 6;
+      $itemsCount = (defined('HISTORY_LENGTH') && is_numeric(HISTORY_LENGTH) && (HISTORY_LENGTH > 0)) ? HISTORY_LENGTH : 6;
       $historyItems = getTasksHistory($itemsCount);
       
       if(count($historyItems) > 0) {
