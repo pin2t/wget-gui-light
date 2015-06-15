@@ -133,7 +133,7 @@ var l10n = {
     'setting_store_in_cookie': 'Эта настройка будет сохранена в файле cookie',
   },
   
-  // @translator  Florian M <florian.m@flothegeek.fr>
+  // @translator  Florian M <flo.siteweb@free.fr>
   // @homepage    <http://flothegeek.fr/>
   // @language    French (fr)
   // @ready_for   0.1.7
@@ -147,7 +147,7 @@ var l10n = {
     'close':               'Fermer',
     'bookmark_download':   'Ajouter en marque-page',
     'bookmark':            'Marque-page',
-    //'bookmark_dont_click': '',
+    'bookmark_dont_click': 'Déplacez-moi vers vos marques-pages, ne pas cliquer ici :)',
     'downloaded_files':    'Fichiers téléchargés',
     'install_google_ext':  'Installer le plug-in pour Google Chrome',
 
@@ -169,10 +169,10 @@ var l10n = {
     'From_task':      'De la tâche',
     'return_message': 'Message retourné',
     'bytes':          'Octets',
-    //'kb':             '',
-    //'mb':             '',
-    //'gb':             '',
-    //'tb':             '',
+    'kb':             'Ko',
+    'mb':             'Mo',
+    'gb':             'Go',
+    'tb':             'To',
     'data_updated':   'Mis à jour',
 
     'download_not_added': 'Téléchargement non ajouté',
