@@ -31,7 +31,7 @@ header('Content-Type: application/json; charset=UTF-8'); // Default header
 header('Access-Control-Allow-Origin: *'); // For request from anywhere
 
 if(defined('DEBUG_MODE') && DEBUG_MODE) {
-  error_reporting(-1); ini_set('display_errors', 'On');
+  error_reporting(E_ALL); ini_set('display_errors', 'On');
 } else error_reporting(0);
 
 if(!defined('TMP_PATH')) define('TMP_PATH', '/tmp');
@@ -113,6 +113,59 @@ class log {
   
   public static function emptyLine() {
     return self::writeLog(self::DebugLog, '');
+  }
+}
+
+/**
+ * @author    Andrea Giammarchi
+ * @site      http://www.devpro.it/
+ * @version   0.4 [fixed string convertion problems, add stdClass optional convertion instead of associative array (used by default)]
+ * @requires  PHP 5.2 or greater
+ * @issue     <https://github.com/tarampampam/wget-gui-light/issues/17>
+ * @source    <http://www.phpclasses.org/browse/file/17166.html> (cut some functions)
+ * @source    <http://www.phpclasses.org/browse/file/17166.html> (cut some functions)
+*/
+class FastJSON {
+  static public function convert($params, $result = null){
+    switch(gettype($params)){
+      case 'array': $tmp = array(); foreach($params as $key => $value) {if(($value = FastJSON::encode($value)) !== '') array_push($tmp, FastJSON::encode(strval($key)).':'.$value);}; $result = '{'.implode(',', $tmp).'}'; break;
+      case 'boolean': $result = $params ? 'true' : 'false'; break;
+      case 'double': case 'float': case 'integer': $result = $result !== null ? strftime('%Y-%m-%dT%H:%M:%S', $params) : strval($params); break;
+      case 'NULL': $result = 'null'; break;
+      case 'string': $i = create_function('&$e, $p, $l', 'return intval(substr($e, $p, $l));'); if(preg_match('/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $params)) $result = mktime($i($params, 11, 2), $i($params, 14, 2), $i($params, 17, 2), $i($params, 5, 2), $i($params, 9, 2), $i($params, 0, 4)); break;
+      case 'object': $tmp = array(); if(is_object($result)) {foreach($params as $key => $value) $result->$key = $value;} else {$result = get_object_vars($params); foreach($result as $key => $value) {if(($value = FastJSON::encode($value)) !== '') array_push($tmp, FastJSON::encode($key).':'.$value);}; $result = '{'.implode(',', $tmp).'}';} break;
+    }
+    return $result;
+  }
+  static public function encode($decode){
+    $result = '';
+    switch(gettype($decode)){
+      case 'array': if(!count($decode) || array_keys($decode) === range(0, count($decode) - 1)) {$keys = array(); foreach($decode as $value) {if(($value = FastJSON::encode($value)) !== '') array_push($keys, $value);} $result = '['.implode(',', $keys).']';} else $result = FastJSON::convert($decode); break;
+      case 'string': $replacement = FastJSON::__getStaticReplacement(); $result = '"'.str_replace($replacement['find'], $replacement['replace'], $decode).'"'; break;
+      default: if(!is_callable($decode)) $result = FastJSON::convert($decode); break;
+    }
+    return $result;
+  }
+  static private function __getStaticReplacement(){
+    static $replacement = array('find'=>array(), 'replace'=>array());
+    if($replacement['find'] == array()) {
+      foreach(array_merge(range(0, 7), array(11), range(14, 31)) as $v) {$replacement['find'][] = chr($v); $replacement['replace'][] = "\\u00".sprintf("%02x", $v);}
+      $replacement['find'] = array_merge(array(chr(0x5c), chr(0x2F), chr(0x22), chr(0x0d), chr(0x0c), chr(0x0a), chr(0x09), chr(0x08)), $replacement['find']);
+      $replacement['replace'] = array_merge(array('\\\\', '\\/', '\\"', '\r', '\f', '\n', '\t', '\b'), $replacement['replace']);
+    }  
+    return $replacement;
+  }
+  static private function __decode(&$encode, &$pos, &$slen, &$stdClass){
+    switch($encode{$pos}) {
+      case 't': $result = true; $pos += 4; break;
+      case 'f': $result = false; $pos += 5; break;
+      case 'n': $result = null; $pos += 4; break;
+      case '[': $result = array(); ++$pos; while($encode{$pos} !== ']') {array_push($result, FastJSON::__decode($encode, $pos, $slen, $stdClass)); if($encode{$pos} === ',') ++$pos;} ++$pos; break;
+      case '{': $result = $stdClass ? new stdClass : array(); ++$pos; while($encode{$pos} !== '}') {$tmp = FastJSON::__decodeString($encode, $pos); ++$pos; if($stdClass) $result->$tmp = FastJSON::__decode($encode, $pos, $slen, $stdClass); else $result[$tmp] = FastJSON::__decode($encode, $pos, $slen, $stdClass); if($encode{$pos} === ',') ++$pos;} ++$pos; break;
+      case '"': switch($encode{++$pos}) {case '"': $result = ""; break; default: $result = FastJSON::__decodeString($encode, $pos); break;} ++$pos; break;
+      default: $tmp = ''; preg_replace('/^(\-)?([0-9]+)(\.[0-9]+)?([eE]\+[0-9]+)?/e', '$tmp = "\\1\\2\\3\\4"', substr($encode, $pos)); if($tmp !== '') {$pos += strlen($tmp); $nint = intval($tmp); $nfloat = floatval($tmp); $result = $nfloat == $nint ? $nint : $nfloat;} break;
+    }
+    return $result;
   }
 }
 
@@ -394,21 +447,20 @@ function getWgetTasksList($string = '') {
   // For Linux 'ps -ewwo pid,args'
   // Issue <https://github.com/tarampampam/wget-gui-light/issues/8>
   // Thx to @ghospich <https://github.com/ghospich>
-  $os = php_uname('s');
+  $os = strtolower(php_uname());
   if(isset($os) && !empty($os)) {
-    if(stripos($os, 'bsd') !== false) {
-      $cmd = ps.' -axwwo pid,args';
-      log::debug('FreeBSD detected, $os='.var_export($os, true).', $cmd='.var_export($cmd, true));
+    if(strpos($os, 'linux') !== false) {
+      $cmd = ps.' ewwo pid,args';
     }
-    if(stripos($os, 'linux') !== false) {
-      $cmd = ps.' -ewwo pid,args';
-      log::debug('Linux detected, $os='.var_export($os, true).', $cmd='.var_export($cmd, true));
+    if(strpos($os, 'bsd') !== false) {
+      $cmd = ps.' axwwo pid,args';
     }
+    log::debug('$os='.var_export($os, true).', $cmd='.var_export($cmd, true));
   }
   
   if(!isset($cmd) || empty($cmd)) {
-    log::error('\'ps\' command not setted, os not supported, $os='.var_export($os, true));
-    die('{"status":0,"msg":"OS not supported, write to developer\'s team about this, please '.$os.' '.$cmd.'"}');
+    log::error('\'ps\' command not setted or os not supported, $os='.var_export($os, true));
+    die('{"status":0,"msg":"This server OS not supported, write to developer\'s team about this, info: \''.makeStringSafe($os).'\', \''.makeStringSafe($cmd).'\'"}');
   }
   
   $tasks = bash(ps.' -ewwo pid,args', 'array');
@@ -944,57 +996,12 @@ function echoResult($data, $type) {
       if(function_exists('json_encode')) {
         echo(json_encode($data));
       } else {
-        ## author    Andrea Giammarchi
-        ## site      http://www.devpro.it/
-        ## version   0.4 [fixed string convertion problems, add stdClass optional convertion instead of associative array (used by default)]
-        ## requires  PHP 5.2 or greater
-        ## issue     <https://github.com/tarampampam/wget-gui-light/issues/17>
-        ## source    <http://www.phpclasses.org/browse/file/17166.html> (cut some functions)
-        class FastJSON {
-          static public function convert($params, $result = null){
-            switch(gettype($params)){
-              case 'array': $tmp = array(); foreach($params as $key => $value) {if(($value = FastJSON::encode($value)) !== '') array_push($tmp, FastJSON::encode(strval($key)).':'.$value);}; $result = '{'.implode(',', $tmp).'}'; break;
-              case 'boolean': $result = $params ? 'true' : 'false'; break;
-              case 'double': case 'float': case 'integer': $result = $result !== null ? strftime('%Y-%m-%dT%H:%M:%S', $params) : strval($params); break;
-              case 'NULL': $result = 'null'; break;
-              case 'string': $i = create_function('&$e, $p, $l', 'return intval(substr($e, $p, $l));'); if(preg_match('/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $params)) $result = mktime($i($params, 11, 2), $i($params, 14, 2), $i($params, 17, 2), $i($params, 5, 2), $i($params, 9, 2), $i($params, 0, 4)); break;
-              case 'object': $tmp = array(); if(is_object($result)) {foreach($params as $key => $value) $result->$key = $value;} else {$result = get_object_vars($params); foreach($result as $key => $value) {if(($value = FastJSON::encode($value)) !== '') array_push($tmp, FastJSON::encode($key).':'.$value);}; $result = '{'.implode(',', $tmp).'}';} break;
-            }
-            return $result;
-          }
-          static public function encode($decode){
-            $result = '';
-            switch(gettype($decode)){
-              case 'array': if(!count($decode) || array_keys($decode) === range(0, count($decode) - 1)) {$keys = array(); foreach($decode as $value) {if(($value = FastJSON::encode($value)) !== '') array_push($keys, $value);} $result = '['.implode(',', $keys).']';} else $result = FastJSON::convert($decode); break;
-              case 'string': $replacement = FastJSON::__getStaticReplacement(); $result = '"'.str_replace($replacement['find'], $replacement['replace'], $decode).'"'; break;
-              default: if(!is_callable($decode)) $result = FastJSON::convert($decode); break;
-            }
-            return $result;
-          }
-          static private function __getStaticReplacement(){
-            static $replacement = array('find'=>array(), 'replace'=>array());
-            if($replacement['find'] == array()) {
-              foreach(array_merge(range(0, 7), array(11), range(14, 31)) as $v) {$replacement['find'][] = chr($v); $replacement['replace'][] = "\\u00".sprintf("%02x", $v);}
-              $replacement['find'] = array_merge(array(chr(0x5c), chr(0x2F), chr(0x22), chr(0x0d), chr(0x0c), chr(0x0a), chr(0x09), chr(0x08)), $replacement['find']);
-              $replacement['replace'] = array_merge(array('\\\\', '\\/', '\\"', '\r', '\f', '\n', '\t', '\b'), $replacement['replace']);
-            }  
-            return $replacement;
-          }
-          static private function __decode(&$encode, &$pos, &$slen, &$stdClass){
-            switch($encode{$pos}) {
-              case 't': $result = true; $pos += 4; break;
-              case 'f': $result = false; $pos += 5; break;
-              case 'n': $result = null; $pos += 4; break;
-              case '[': $result = array(); ++$pos; while($encode{$pos} !== ']') {array_push($result, FastJSON::__decode($encode, $pos, $slen, $stdClass)); if($encode{$pos} === ',') ++$pos;} ++$pos; break;
-              case '{': $result = $stdClass ? new stdClass : array(); ++$pos; while($encode{$pos} !== '}') {$tmp = FastJSON::__decodeString($encode, $pos); ++$pos; if($stdClass) $result->$tmp = FastJSON::__decode($encode, $pos, $slen, $stdClass); else $result[$tmp] = FastJSON::__decode($encode, $pos, $slen, $stdClass); if($encode{$pos} === ',') ++$pos;} ++$pos; break;
-              case '"': switch($encode{++$pos}) {case '"': $result = ""; break; default: $result = FastJSON::__decodeString($encode, $pos); break;} ++$pos; break;
-              default: $tmp = ''; preg_replace('/^(\-)?([0-9]+)(\.[0-9]+)?([eE]\+[0-9]+)?/e', '$tmp = "\\1\\2\\3\\4"', substr($encode, $pos)); if($tmp !== '') {$pos += strlen($tmp); $nint = intval($tmp); $nfloat = floatval($tmp); $result = $nfloat == $nint ? $nint : $nfloat;} break;
-            }
-            return $result;
-          }
+        if(class_exists('FastJSON')) {
+          log::debug('PHP function json_encode() is unavailable, used FastJSON class, $data='.var_export($data, true));
+          echo(FastJSON::encode($data));
+        } else {
+          log::debug('PHP function json_encode() is unavailable and FastJSON class not exists');
         }
-        log::debug('PHP function json_encode() is unavailable, used FastJSON class, $data='.var_export($data, true));
-        echo(FastJSON::encode($data));
       }
       break;
     case 'text':

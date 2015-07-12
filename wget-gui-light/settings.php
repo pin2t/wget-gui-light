@@ -102,8 +102,6 @@ define('WGET_SECRET_FLAG', '--max-redirect=4321');
 ## Setup default timezone (if not setted)
 if(!ini_get('date.timezone')) date_default_timezone_set('GMT');
 
-error_reporting((defined('DEBUG_MODE') && DEBUG_MODE) ? E_ALL : 0);
-
 #   _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
 #   \____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\
 #
