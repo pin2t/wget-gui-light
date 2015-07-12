@@ -1,6 +1,6 @@
 ## История изменений
 
-0.1.8
+[0.1.8](https://github.com/tarampampam/wget-gui-light/commit/f4597e51f6b79e4fff0c32a9a064952f499c1493)
 ----------
 * Добавлен флаг "--no-check-certificate" для `wget`
 * Добавлена альтернатива функции json_encode() ([Issue #17](https://github.com/tarampampam/wget-gui-light/issues/17))
