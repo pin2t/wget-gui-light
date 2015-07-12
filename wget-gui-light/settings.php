@@ -22,7 +22,7 @@
 #
 
 ## Project version
-define('WGET_GUI_LIGHT_VERSION', '0.1.7');
+define('WGET_GUI_LIGHT_VERSION', '0.1.8');
 
 ## Add debug info to log-file (and maybe some output) + a lot of info in gui
 ##    console (used 'console.log') . Comment this line or set 'false' for

@@ -1,7 +1,7 @@
 Wget GUI Light
 =========
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.7/lightgrey.png)
+![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![license MIT](http://gitshields.com/v2/text/os/linux/orange.png)&nbsp;![php 4,5](http://gitshields.com/v2/text/php/4,5/blue.png)&nbsp;![version](http://gitshields.com/v2/text/version/0.1.8/lightgrey.png)
 
 #### What is it? / Что это?
 
