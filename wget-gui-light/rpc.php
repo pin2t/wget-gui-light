@@ -123,7 +123,8 @@ class log {
  * @requires  PHP 5.2 or greater
  * @issue     <https://github.com/tarampampam/wget-gui-light/issues/17>
  * @source    <http://www.phpclasses.org/browse/file/17166.html> (cut some functions)
- * @source    <http://www.phpclasses.org/browse/file/17166.html> (cut some functions)
+
+ * @since     0.1.8
 */
 class FastJSON {
   static public function convert($params, $result = null){
@@ -657,10 +658,10 @@ function addWgetTask($url, $saveAs) {
   
   // DOWNLOAD YOUTUBE VIDEO
   // Detect - if url is link to youtube video
-  if((strpos($url, 'youtube.com/') !== false) || (strpos($url, 'youtu.be/') !== false)) {
+  if((stripos($url, 'youtube.com/') !== false) || (stripos($url, 'youtu.be/') !== false)) {
     $youtubeVideos = array();
     // http://stackoverflow.com/a/10315969/2252921
-    preg_match('/^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/', $url, $founded);
+    preg_match('/^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/i', $url, $founded);
     define('YoutubeVideoID', @$founded[1]); // Set as constant YouTube video ID
     if(strlen(YoutubeVideoID) == 11) {
       $rawVideoInfo = file_get_contents('http://youtube.com/get_video_info?video_id='.YoutubeVideoID.'&ps=default&eurl=&gl=US&hl=en');
@@ -746,7 +747,7 @@ function addWgetTask($url, $saveAs) {
   
   // DOWNLOAD VK.COM VIDEO
   // Detect - if url is link to vk.com video
-  if(strpos($url, 'vk.com/video_ext.php') !== false) {
+  if(stripos($url, 'vk.com/video_ext.php') !== false) {
     // For test code/decode url - http://meyerweb.com/eric/tools/dencoder/
     // Get url query and parse it to $q
     $urlParts = parse_url(urldecode($url)); parse_str($urlParts['query'], $q);
@@ -822,6 +823,13 @@ function addWgetTask($url, $saveAs) {
     }
   }
   
+  // DROPBOX 'Content-Disposition' bug fix
+  // Issue - <https://github.com/tarampampam/wget-gui-light/issues/17>
+  if(stripos($url, 'dropboxusercontent.com/') !== false) {
+    $file_name = basename($url);
+    if(!empty($file_name)) {$saveAs = $file_name;}
+  }
+  
   //var_dump($videoToDownload);
   
   $historyAction = ''; $saveAs = makeStringSafe($saveAs);
@@ -856,7 +864,7 @@ function addWgetTask($url, $saveAs) {
     '--restrict-file-names=nocontrol '. // For Cyrillic correct filenames
     $speedLimit.
     $saveAsFile.
-    WGET_SECRET_FLAG.' '. // forever LAST param
+    ' '.WGET_SECRET_FLAG.' '. // forever LAST param
     '"$URL"'.$historyAction.'; '.rm.' -f "$TMPFILE") > /dev/null 2>&1 & echo $!';
   
   log::debug('Command to exec: '.var_export($cmd, true));
@@ -993,14 +1001,15 @@ function echoResult($data, $type) {
 
   switch ($type) {
     case 'json':
-      if(function_exists('json_encode')) {
+      if(function_exists('json_encode')) { // since 0.1.8
         echo(json_encode($data));
       } else {
         if(class_exists('FastJSON')) {
           log::debug('PHP function json_encode() is unavailable, used FastJSON class, $data='.var_export($data, true));
           echo(FastJSON::encode($data));
         } else {
-          log::debug('PHP function json_encode() is unavailable and FastJSON class not exists');
+          log::error('PHP function json_encode() is unavailable and FastJSON class not exists');
+          die('{"status":0,"msg":"PHP function json_encode() is unavailable and FastJSON class not exists"}');
         }
       }
       break;
