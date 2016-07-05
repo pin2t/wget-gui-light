@@ -358,8 +358,8 @@ function makeStringSafe($str) {
 function makeUrlSafe($str) {
   return str_replace( // http://tools.ietf.org/html/rfc1738
     // encode url string, and make "back-encode" for important wget chars
-    array('%2F', '%3A', '%40', '%3F', '%3D', '%26'),
-    array('/',   ':',   '@',   '?',   '=',   '&'),
+    array('%2F', '%3A', '%40', '%3F', '%3D', '%26', '%25'),
+    array('/',   ':',   '@',   '?',   '=',   '&',   '%'),
     rawurlencode($str)
   );
 }
