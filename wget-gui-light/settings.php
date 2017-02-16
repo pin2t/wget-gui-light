@@ -1,6 +1,6 @@
 <?php
 
-## @author    Samoylov Nikolay
+## @author    github.com/tarampampam
 ## @project   Wget GUI Light
 ## @copyright 2015 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
@@ -9,7 +9,7 @@
 #   _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
 #   \____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\
 #
-#     ____             _                  _                    __ _ 
+#     ____             _                  _                    __ _
 #    |  _ \           | |                | |                  / _(_)
 #    | |_) | __ _  ___| | _____ _ __   __| |   ___ ___  _ __ | |_ _  __ _
 #    |  _ < / _` |/ __| |/ / _ \ '_ \ / _` |  / __/ _ \| '_ \|  _| |/ _` |
@@ -35,7 +35,7 @@ define('BASEPATH', realpath(dirname(__FILE__)));
 
 ## Base URL to this script
 ## > With '/' at the end!
-define('BASEURL', 
+define('BASEURL',
   ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')?'https':'http').
   '://'.$_SERVER['SERVER_NAME'].
   ($_SERVER['SERVER_PORT'] !== '80' ? ':'.$_SERVER['SERVER_PORT'] : '').
@@ -55,7 +55,7 @@ define('DOWNLOAD_PATH', BASEPATH.'/downloads');
 ## > With '/' at the end!
 define('DOWNLOAD_URL', BASEURL.'downloads/');
 
-## Path to temp files directory. Temp files will created by 'wget' for 
+## Path to temp files directory. Temp files will created by 'wget' for
 ##   parsing progress state, and will be deleted automatically when finish
 ##   or cancel task (thx to <https://github.com/ghospich>)
 ## > Without '/' at the end!
@@ -105,14 +105,14 @@ if(!ini_get('date.timezone')) date_default_timezone_set('GMT');
 #   _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
 #   \____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\
 #
-#   ______               _                 _                    __ _       
-#  |  ____|             | |               | |                  / _(_)      
-#  | |__ _ __ ___  _ __ | |_ ___ _ __   __| |   ___ ___  _ __ | |_ _  __ _ 
+#   ______               _                 _                    __ _
+#  |  ____|             | |               | |                  / _(_)
+#  | |__ _ __ ___  _ __ | |_ ___ _ __   __| |   ___ ___  _ __ | |_ _  __ _
 #  |  __| '__/ _ \| '_ \| __/ _ \ '_ \ / _` |  / __/ _ \| '_ \|  _| |/ _` |
 #  | |  | | | (_) | | | | ||  __/ | | | (_| | | (_| (_) | | | | | | | (_| |
 #  |_|  |_|  \___/|_| |_|\__\___|_| |_|\__,_|  \___\___/|_| |_|_| |_|\__, |
 #                                                                     __/ |
-#                                                                    |___/ 
+#                                                                    |___/
 #   _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
 #   \____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\\____\
 #
@@ -160,7 +160,7 @@ if(!defined('WGET_GUI_LIGHT_VERSION'))
   array_push($e, sprintf($em['checkSetting'], 'WGET_GUI_LIGHT_VERSION'));
 elseif(floatval(WGET_GUI_LIGHT_VERSION) <= 0)
   array_push($e, sprintf($em['invalidSetting'], 'WGET_GUI_LIGHT_VERSION'));
-  
+
 if(!defined('BASEPATH'))
   array_push($e, sprintf($em['checkSetting'], 'BASEPATH'));
 elseif(!is_dir(BASEPATH))

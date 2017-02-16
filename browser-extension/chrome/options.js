@@ -1,8 +1,8 @@
 /*
-## @author    Samoylov Nikolay
+## @author    github.com/tarampampam
 ## @project   Wget GUI Light
 ## @package   Google Chrome Extension
-## @copyright 2014 <samoylovnn@gmail.com>
+## @copyright 2014 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
 ## @version   Look in 'manifest.json'

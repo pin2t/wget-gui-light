@@ -1,6 +1,6 @@
 <?php
 
-## @author  Samoylov Nikolay
+## @author  github.com/tarampampam
 ## @project   Wget GUI Light
 ## @copyright 2014 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
@@ -53,39 +53,39 @@ class log {
   #const WarningLog = 'wgetgui-warnings.log';
   #const ErrorsLog  = 'wgetgui-errors.log';
   #const DebugLog   = 'wgetgui-debug.log';
-  
+
   private static function getTimeStamp() {
     list($usec, $sec) = explode(' ', microtime());
     return '['.date('Y/m/d H:i:s.', $sec) . substr($usec, 2, 3).']';
   }
-  
+
   private static function checkPermissions() {
     return (file_exists(LOG_PATH) &&
         is_dir(LOG_PATH) &&
         is_writable(LOG_PATH)) ? true : false;
   }
-  
+
   private static function writeLog($logName, $msg = '') {
 
     if(!defined('LOG_PATH')) return false;
-    
+
     $msg = str_replace(array("  ", "\n", "\r", "\t"), "", $msg);
     $msg = str_replace(array(",)", ", )"), ")", $msg);
     $msg = str_replace("array (", "array(", $msg);
-    
+
     if(!self::checkPermissions()) {
       mkdir(LOG_PATH, 0777, true); chmod(LOG_PATH, 0777);
       if(!self::checkPermissions())
         return false;
     }
-    
+
     $LogFilePath = LOG_PATH.'/'.$logName;
-    
+
     $logFile = fopen($LogFilePath, 'a');
     if($logFile)
       if(fwrite($logFile, $msg."\n"))
         fclose($logFile);
-    
+
     return true;
   }
 
@@ -93,24 +93,24 @@ class log {
     return self::writeLog(self::ErrorsLog,
                 self::getTimeStamp().' (ERROR) '.$msg);
   }
-  
+
   public static function warning($msg) {
     return self::writeLog(self::WarningLog,
                 self::getTimeStamp().' (warning) '.$msg);
   }
-  
+
   public static function notice($msg) {
     return self::writeLog(self::NoticesLog,
                 self::getTimeStamp().' (notice) '.$msg);
   }
-  
+
   public static function debug($msg) {
     if(defined('DEBUG_MODE') && DEBUG_MODE)
       return self::writeLog(self::DebugLog,
                                self::getTimeStamp().' (debug) '.$msg);
     else return false;
   }
-  
+
   public static function emptyLine() {
     return self::writeLog(self::DebugLog, '');
   }
@@ -153,7 +153,7 @@ class FastJSON {
       foreach(array_merge(range(0, 7), array(11), range(14, 31)) as $v) {$replacement['find'][] = chr($v); $replacement['replace'][] = "\\u00".sprintf("%02x", $v);}
       $replacement['find'] = array_merge(array(chr(0x5c), chr(0x2F), chr(0x22), chr(0x0d), chr(0x0c), chr(0x0a), chr(0x09), chr(0x08)), $replacement['find']);
       $replacement['replace'] = array_merge(array('\\\\', '\\/', '\\"', '\r', '\f', '\n', '\t', '\b'), $replacement['replace']);
-    }  
+    }
     return $replacement;
   }
   static private function __decode(&$encode, &$pos, &$slen, &$stdClass){
@@ -259,7 +259,7 @@ function remove_accents($string) {
  */
 function transliterate($string) {
   // http://goo.gl/ZOiMGL - ISO/R 9 (1968), GOST 16876-71, OON (1987)
-  $q = chr(226).chr(128).chr(179); $s = chr(226).chr(128).chr(178); 
+  $q = chr(226).chr(128).chr(179); $s = chr(226).chr(128).chr(178);
   $chars = array(
   chr(208).chr(144)=>'A', chr(208).chr(176)=>'a', chr(208).chr(145)=>'B',
   chr(208).chr(177)=>'b', chr(208).chr(146)=>'V', chr(208).chr(178)=>'v',
@@ -296,15 +296,15 @@ function transliterate($string) {
  */
 function bash($cmd, $result_type = '') {
   $out = ''; $result = '';
-  
+
   if(empty($cmd))
     return false;
-    
+
   // Switch output language to English
   exec('export LC_ALL=C; '.$cmd, $out);
-  
+
   $result_type = empty($result_type) ? 'string' : $result_type;
-  
+
   switch ($result_type) {
     case 'string':
       foreach($out as $line)
@@ -339,8 +339,8 @@ function validatePid($pid) {
  */
 function makeStringSafe($str) {
   return trim(
-    str_replace(array('  '), array(' '), 
-      preg_replace('/[^a-zA-Z0-9_ %\[\]\.\(\)%&-]/s', '', 
+    str_replace(array('  '), array(' '),
+      preg_replace('/[^a-zA-Z0-9_ %\[\]\.\(\)%&-]/s', '',
         remove_accents(
           transliterate($str)
         )
@@ -424,18 +424,18 @@ function getFilesListInDirecrory($dir, $listDir = array()) {
           if(is_readable($absolute_filepath) && (count(scandir($absolute_filepath)) > 2 /* '.' and '..' */)) {
             $listDir[$sub] = getFilesListInDirecrory($absolute_filepath);
           }
-        } 
-      } 
-    }  
-    closedir($handler); 
-  } 
-  return $listDir;  
+        }
+      }
+    }
+    closedir($handler);
+  }
+  return $listDir;
 }
 
 
 /**
  * Get wget tasks from `ps` 'as is'; or only with string, if $string is not
- *  empty (passed in $string); or with PID = $string, if $string is 
+ *  empty (passed in $string); or with PID = $string, if $string is
  *  valid PID
  *
  * @param  (string|numeric) (string) String or PID for search
@@ -458,17 +458,17 @@ function getWgetTasksList($string = '') {
     }
     log::debug('$os='.var_export($os, true).', $cmd='.var_export($cmd, true));
   }
-  
+
   if(!isset($cmd) || empty($cmd)) {
     log::error('\'ps\' command not setted or os not supported, $os='.var_export($os, true));
     die('{"status":0,"msg":"This server OS not supported, write to developer\'s team about this, info: \''.makeStringSafe($os).'\', \''.makeStringSafe($cmd).'\'"}');
   }
-  
+
   $tasks = bash(ps.' -ewwo pid,args', 'array');
   $string = empty($string) ? ' ' : (string) $string;
-  
+
   //var_dump($tasks);
-  
+
   foreach($tasks as $task) {
     // make FAST search:
     // find string with 'wget' and without '2>&1'
@@ -489,7 +489,7 @@ function getWgetTasksList($string = '') {
       }
     }
   }
-  
+
   // If in '$string' passed PID
   if(validatePid($string)) {
     foreach($result as $task)
@@ -499,7 +499,7 @@ function getWgetTasksList($string = '') {
       }
     return array();
   }
-  
+
   log::debug('getWgetTasksList() return '.var_export($result, true));
   return $result;
 }
@@ -521,25 +521,25 @@ function getWgetTasks() {
         // Read last line <http://stackoverflow.com/a/1510248>
         $lastline = (string) ''; $f = fopen($task['logfile'], 'r'); $cursor = -1;
         fseek($f, $cursor, SEEK_END); $char = fgetc($f);
-        
+
         while ($char === "\n" || $char === "\r") {
           fseek($f, $cursor--, SEEK_END);
           $char = fgetc($f);
         }
-        
+
         while ($char !== false && $char !== "\n" && $char !== "\r") {
           $lastline = $char . $lastline;
           fseek($f, $cursor--, SEEK_END);
           $char = fgetc($f);
         }
-        
+
         preg_match("/(\d{1,2}).*\[.*].*/i", $lastline, $founded);
         $preogress = !is_null(@$founded[1]) ? @$founded[1] : -1;
         //print_r($founded);
-        
+
         log::debug('Last line is '.var_export($lastline, true).', progress value is '.var_export($preogress, true));
       }
-      
+
       array_push($result, array(
         'pid'    => (int) $task['pid'],
         'logfile'  => (string) $task['logfile'],
@@ -570,7 +570,7 @@ function removeWgetTask($pid) {
       }
     }
   }
-  
+
   log::debug('(call) removeWgetTask() called, $pid='.var_export($pid, true));
   if(!validatePid($pid))
     return array(
@@ -580,7 +580,7 @@ function removeWgetTask($pid) {
 
   $taskData = getWgetTasksList($pid);
   //var_dump($taskData);
-  
+
   if(empty($taskData)) {
     log::debug('Task with ID '.$pid.' not exists');
     return array(
@@ -588,20 +588,20 @@ function removeWgetTask($pid) {
       'msg' => 'Task not exists'
     );
   }
-  
-  
-  
+
+
+
   $kill = @posix_kill((int) $taskData['pid'], 15); // http://php.net/manual/ru/function.posix-kill.php
   //var_dump($kill);
   if(!$kill) log::error('Task with PID '.$taskData['pid'].' NOT killed');
-  
+
   usleep(200000); // at first - subprocess must del file. if not - when del we // 1/5 sec
   if (!empty($taskData['logfile']) && file_exists($taskData['logfile'])) {
     log::notice('removeWgetTask() remove file '.var_export($taskData['logfile'], true));
     $del = @unlink($taskData['logfile']); // http://php.net//manual/ru/function.unlink.php
     if(!$del) log::error('File '.var_export($taskData['logfile'], true).' NOT deleted');
   }
-  
+
   if(!is_null($taskData['pid']) && $kill) {
     log::notice('Task with ID '.var_export($taskData['pid'], true).' killed');
     return array(
@@ -609,7 +609,7 @@ function removeWgetTask($pid) {
       'msg' => 'Task removed success'
     );
   }
-    
+
   return array(
     'result' => false,
     'msg' => 'No remove data'
@@ -636,11 +636,11 @@ function addWgetTask($url, $saveAs) {
     } return true;
   }
   log::debug('(call) addWgetTask() called, $url='.var_export($url, true).', $saveAs='.var_export($saveAs, true));
-  
+
   define('OriginalTaskUrl', $url); // Save in constant original task url
-  
+
   if(empty($url)) return array('result' => false, 'msg' => 'No URL');
-  
+
   if(defined('WGET_ONE_TIME_LIMIT') && (count(getWgetTasks())+1 > WGET_ONE_TIME_LIMIT)) {
     log::notice('Task not added, because one time tasks limit is reached');
     return array('result' => false, 'msg' => 'One time tasks limit is reached');
@@ -650,12 +650,12 @@ function addWgetTask($url, $saveAs) {
     log::error('"DOWNLOAD_PATH" not defined');
     return array('result' => false, 'msg' => '"DOWNLOAD_PATH" not defined');
   }
-  
+
   if(!checkDirectory(DOWNLOAD_PATH)) {
     log::error('Directory '.var_export(DOWNLOAD_PATH, true).' cannot be created');
     return array('result' => false, 'msg' => 'Cannot create directory for downloads');
   }
-  
+
   // DOWNLOAD YOUTUBE VIDEO
   // Detect - if url is link to youtube video
   if((stripos($url, 'youtube.com/') !== false) || (stripos($url, 'youtu.be/') !== false)) {
@@ -689,7 +689,7 @@ function addWgetTask($url, $saveAs) {
                 'quality'   => @$videoItemData['quality']
               ));
             } else {
-              log::error('Link to youtube source video file not exists '.var_export($videoItemData, true)); 
+              log::error('Link to youtube source video file not exists '.var_export($videoItemData, true));
               return array('result' => false, 'msg' => 'Link to youtube source video file not exists');
             }
           }
@@ -700,14 +700,14 @@ function addWgetTask($url, $saveAs) {
           log::error($errorDescription.', raw='.var_export($rawVideoInfo, true));
           return array('result' => false, 'msg' => $errorDescription);
         }
-        
+
       } else {
         log::error('Cannot call "file_get_contents()" for $url='.var_export($url, true));
         return array('result' => false, 'msg' => 'Cannot get remote content');
       }
     }
     //var_dump($youtubeVideos);
-    
+
     // If we found video links
     if(count($youtubeVideos) > 0) {
       // Get first 'mp4' video
@@ -719,11 +719,11 @@ function addWgetTask($url, $saveAs) {
             break;
           }
         }
-      
+
       // Or take first video (by default - with highest quality)
       if(!isset($videoToDownload))
         $videoToDownload = $youtubeVideos[0];
-      
+
       preg_match('~\/(.*?)\;~', $videoToDownload['type'], $extension);
       switch (@$extension[1]) {
         case 'mp4':   $fileExtension = 'mp4';  break;
@@ -732,9 +732,9 @@ function addWgetTask($url, $saveAs) {
         case '3gpp':  $fileExtension = '3gp';  break;
         default: $fileExtension = 'video';
       }
-      
+
       $clearTitle = makeStringSafe(@$videoToDownload['title']);
-      
+
       // Tadaaam :)
       $url = $videoToDownload['url'];
       if(empty($saveAs))
@@ -744,7 +744,7 @@ function addWgetTask($url, $saveAs) {
           $saveAs = $videoToDownload['title'].' ('.$videoToDownload['quality'].').'.$fileExtension;
     }
   }
-  
+
   // DOWNLOAD VK.COM VIDEO
   // Detect - if url is link to vk.com video
   if(stripos($url, 'vk.com/video_ext.php') !== false) {
@@ -757,31 +757,31 @@ function addWgetTask($url, $saveAs) {
        isset($q['hash']) && !empty($q['hash'])) {
       // Build request url
       $queryUrl = 'https://vk.com/video_ext.php?oid='.$q['oid'].'&id='.$q['id'].'&hash='.$q['hash'];
-      
+
       // Get page content
       $rawVideoInfo = file_get_contents($queryUrl);
       if(($rawVideoInfo !== false)) {
         if(preg_match('/.*\<div.*id\=\"video_player\".*/im', $rawVideoInfo) !== 0) {
           $videoData = array();
-          
+
           preg_match('/\&amp\;url240\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
           $videoData['240'] = urldecode(@$f[1]);
-          
+
           preg_match('/\&amp\;url360\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
           $videoData['360'] = urldecode(@$f[1]);
-          
+
           preg_match('/\&amp\;url480\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
           $videoData['480'] = urldecode(@$f[1]);
-          
+
           preg_match('/\&amp\;url720\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
           $videoData['720'] = urldecode(@$f[1]);
-          
+
           preg_match('/\&amp\;thumb\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
           $videoData['thumbnail'] = trim(urldecode(@$f[1]));
-          
+
           preg_match('/\&amp\;md_title\=(.*?)\&amp\;/i', $rawVideoInfo, $f);
           $videoData['title'] = trim(urldecode(@$f[1]));
-          
+
           // video in low quality always must exists, if parse complete without errors
           if(isset($videoData['240']) && !empty($videoData['240'])) {
             $videoQualityStr = '';
@@ -822,22 +822,22 @@ function addWgetTask($url, $saveAs) {
       return array('result' => false, 'msg' => 'Request error - some important query part(s) not exists');
     }
   }
-  
+
   // DROPBOX 'Content-Disposition' bug fix
   // Issue - <https://github.com/tarampampam/wget-gui-light/issues/17>
   if(stripos($url, 'dropboxusercontent.com/') !== false) {
     $file_name = basename($url);
     if(!empty($file_name)) {$saveAs = $file_name;}
   }
-  
+
   //var_dump($videoToDownload);
-  
+
   $historyAction = ''; $saveAs = makeStringSafe($saveAs);
   if(defined('LOG_HISTORY'))
     if(checkDirectory(dirname(LOG_HISTORY))) {
       $savedAsCmdString = (!empty($saveAs)) ? ' ## SavedAs: \"'.$saveAs.'\"' : '';
       // If string passed in '$url' and saved 'OriginalTaskUrl' not equal each other,
-      //   we understand - URL was PARSED and changed. And now, for a history 
+      //   we understand - URL was PARSED and changed. And now, for a history
       //   (tadatadaaaam =)) we must write ORIGINAL url (not parsed)
       $urlForHistory = ($url !== OriginalTaskUrl) ? OriginalTaskUrl : $url;
       $urlForHistoryCmd = ($url !== OriginalTaskUrl) ? ' && URL="'.$urlForHistory.'"' : '';
@@ -848,11 +848,11 @@ function addWgetTask($url, $saveAs) {
                               'fi';
     } else
       log::error('Directory '.var_export(dirname(LOG_HISTORY), true).' cannot be created');
-      
+
   $speedLimit = (defined('WGET_DOWNLOAD_LIMIT')) ? '--limit-rate='.WGET_DOWNLOAD_LIMIT.'k ' : ' ';
   $saveAsFile  = (!empty($saveAs)) ? '--output-document="'.DOWNLOAD_PATH.'/'.$saveAs.'" ' : ' ';
   $tmpFileName = TMP_PATH.'/wget'.rand(1, 32768).'.log.tmp';
-  
+
   $cmd = '(URL="'.$url.'"; TMPFILE="'.$tmpFileName.'"; echo > "$TMPFILE"; '.wget.' '.
     '--progress=bar:force --output-file="$TMPFILE" '. // forever stand at beginning
     '--tries=0 '.
@@ -866,9 +866,9 @@ function addWgetTask($url, $saveAs) {
     $saveAsFile.
     ' '.WGET_SECRET_FLAG.' '. // forever LAST param
     '"$URL"'.$historyAction.'; '.rm.' -f "$TMPFILE") > /dev/null 2>&1 & echo $!';
-  
+
   log::debug('Command to exec: '.var_export($cmd, true));
-  
+
   $task = bash($cmd, 'string');
   if(empty($task)) {
     log::error('Exec task '.var_export($cmd, true).' error');
@@ -877,9 +877,9 @@ function addWgetTask($url, $saveAs) {
       'msg' => 'Exec task error'
     );
   }
-  
+
   usleep(100000); // 1/10 sec
-  
+
   preg_match("/(\d{2,7})/i", $task, $founded);
   $parentPid = @$founded[1];
   if(!validatePid($parentPid)) {
@@ -890,7 +890,7 @@ function addWgetTask($url, $saveAs) {
     );
   }
 
-  //var_dump($cmd); var_dump($task); var_dump($parentPid); 
+  //var_dump($cmd); var_dump($task); var_dump($parentPid);
 
   // Wait ~1 sec until child pipe not running, check every second
   for ($i = 1; $i <= 4; $i++) {
@@ -898,13 +898,13 @@ function addWgetTask($url, $saveAs) {
     $taskData = getWgetTasksList($tmpFileName);
     // Get last job with current URL
     $taskPid = @$taskData[0]['pid'];
-    
-    if(validatePid($taskPid)) 
+
+    if(validatePid($taskPid))
       break;
     else
       usleep(250000); // 1/4 sec
   }
-  
+
   if(!file_exists($tmpFileName)) {
     log::notice('Task '.var_export($url, true).' already complete (probably with error)');
     return array(
@@ -912,7 +912,7 @@ function addWgetTask($url, $saveAs) {
       'msg' => 'Task completed too fast (probably with error)'
     );
   }
-  
+
   if(!validatePid($taskPid)) {
     log::error('Task PID '.var_export($taskPid, true).' for '.var_export($url, true).' not valid');
     return array(
@@ -920,7 +920,7 @@ function addWgetTask($url, $saveAs) {
       'msg' => 'Task PID not valid'
     );
   }
-  
+
   log::notice('Task '.var_export($url, true).' added successful (pid '.var_export($taskPid, true).')');
   return array(
     'result' => true,
@@ -968,7 +968,7 @@ function getTasksHistory($count = 5) {
       preg_match("/\s\#\#\sSavedAs\:\s\"(.*?)\"/i", $currentLine, $saveAsRaw);
       if(isset($saveAsRaw[1]) && !empty($saveAsRaw[1]))
         $subResult['saved_as'] = (string) $saveAsRaw[1];
-      
+
       // Since v0.1.6
       $filename = basename(
         isset($subResult['saved_as']) ? $subResult['saved_as'] : (isset($subResult['downloaded_url']) ? $subResult['downloaded_url'] : '')
@@ -1043,9 +1043,9 @@ if(isset($argv) && (count($_GET) === 0) && (count($_POST) === 0)) {
 }
 
 // AJAX send data in GET, html in POST
-if((count($_POST) > 0) and (count($_GET) === 0)) 
+if((count($_POST) > 0) and (count($_GET) === 0))
   $_GET = $_POST;
-else 
+else
   $_POST = $_GET;
 
 if(!empty($_GET['action'])) {
@@ -1057,15 +1057,15 @@ if(!empty($_GET['action'])) {
     'saveAs' => makeStringSafe(@$_GET['saveAs']),
     'id'   => preg_replace("/[^0-9]/", "", @$_GET['id'])
   );
-  
+
   log::debug('Prepared data: '.var_export($formData, true));
-  
+
   switch ($formData['action']) {
     ## Action - Get Tasks List
     ##########################
     case 'get_list':
       $result['tasks'] = array();
-      
+
       foreach (getWgetTasks() as $task) {
         array_push($result['tasks'], array(
           'url'      => (string) $task['url'],
@@ -1082,15 +1082,15 @@ if(!empty($_GET['action'])) {
 
       $result['status'] = 1;
       break;
-      
+
     ## Action - Add Task
     ####################
     case 'add_task':
       $url  = $formData['url'];
       $saveAs = (!empty($formData['saveAs'])) ? $formData['saveAs'] : '';
-      
+
       $addTaskResult = addWgetTask($url, $saveAs);
-      
+
       if($addTaskResult['result'] === true) {
         $result['msg']  = !empty($addTaskResult['msg']) ? $addTaskResult['msg'] : 'Task added success';
         $result['id']   = (isset($addTaskResult['pid']) && validatePid($addTaskResult['pid'])) ? (int) $addTaskResult['pid'] : -1;
@@ -1100,12 +1100,12 @@ if(!empty($_GET['action'])) {
         $result['status'] = 0;
       }
       break;
-      
+
     ## Action - Cancel (remove) Task
     ################################
     case 'remove_task':
       $id = $formData['id'];
-      
+
       $removeResult = removeWgetTask($id);
       if($removeResult['result'] === true) {
         $result['msg']  = $removeResult['msg'];
@@ -1115,13 +1115,13 @@ if(!empty($_GET['action'])) {
         $result['status'] = 0;
       }
       break;
-      
+
     ## Action - Get history
     #######################
     case 'get_history':
       $itemsCount = (defined('HISTORY_LENGTH') && is_numeric(HISTORY_LENGTH) && (HISTORY_LENGTH > 0)) ? HISTORY_LENGTH : 6;
       $historyItems = getTasksHistory($itemsCount);
-      
+
       if(count($historyItems) > 0) {
         $result['history'] = $historyItems;
         $result['msg']     = 'Recent '.$itemsCount.' history entries';
@@ -1131,7 +1131,7 @@ if(!empty($_GET['action'])) {
         $result['status'] = 0;
       }
       break;
-      
+
     ## Action - Get downloaded files list
     #####################################
     case 'get_fileslist':
@@ -1144,7 +1144,7 @@ if(!empty($_GET['action'])) {
         $result['status'] = 0;
       }
       break;
-      
+
     ## Action - Cancel (remove) Task
     ################################
     case 'test':
@@ -1194,7 +1194,7 @@ if(!empty($_GET['action'])) {
         break;
       }
       break;
-      
+
     default:
       $result['msg']  = 'No action';
       $result['status'] = 0;

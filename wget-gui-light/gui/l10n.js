@@ -69,8 +69,8 @@ var l10n = {
     'setting_store_in_cookie': 'This setting will be stored in cookies',          // since 0.1.6
   },
   */
-  
-  // @translator  Samoylov Nikolay <tarampampam@users.noreply.github.com>
+
+  // @translator  github.com/tarampampam <github.com/tarampampam>
   // @homepage    <http://blog.kplus.pro/>
   // @language    Russian (ru)
   // @ready_for   0.1.7
@@ -87,7 +87,7 @@ var l10n = {
     'bookmark_dont_click': 'Перемести меня на панель закладок браузера, а не нажимай прямо здесь :)',
     'downloaded_files':    'Загруженные файлы',
     'install_google_ext':  'Установить плагин для браузера Google Chrome',
-    
+
     'request_rpc_failed':     'Запрос к "rpc" завершился неудачей',
     'http_code':              'код http',
     'get_tasks_list_error':   'Ошибка получения списка задач',
@@ -102,7 +102,7 @@ var l10n = {
     'addr_cannot_be_empty':      'Адрес не может быть пустым',
     'link_format_not_supported': 'Данный формат ссылки не поддерживается',
     'use_this_format':           'используйте следующий формат',
-    
+
     'From_task':      'От задачи',
     'return_message': 'вернулось сообщение',
     'bytes':          'Байт',
@@ -111,18 +111,18 @@ var l10n = {
     'gb':             'Гб',
     'tb':             'Тб',
     'data_updated':   'Данные обновлены',
-    
+
     'download_not_added': 'Задача не добавлена',
     'server_error':       'Ошибка сервера',
     'invalid_address':    'Ошибочный адрес',
     'address':            'адрес',
     'Address':            'Адрес',
     'not_valid':          'не корректен',
-    
+
     'download_task_not_removed': 'Задача не была удалена',
     'open_dl_file_in_new_tab':   'Открыть загруженный файл в новой вкладке',
     'task_completed_with_error': 'Загрузка файла завершилась с ошибкой',
-    
+
     'update_available':        'Доступно обновление',
     'current_version':         'Текущая версия',
     'available_version':       'Доступна версия',
@@ -132,7 +132,7 @@ var l10n = {
     'disable_upd_checking':    'Отменить проверку на наличие новых версии',
     'setting_store_in_cookie': 'Эта настройка будет сохранена в файле cookie',
   },
-  
+
   // @translator  Florian M <flo.siteweb@free.fr>
   // @homepage    <http://flothegeek.fr/>
   // @language    French (fr)
@@ -195,7 +195,7 @@ var l10n = {
     'disable_upd_checking':    'Désactiver la vérification des nouvelles versions',
     'setting_store_in_cookie': 'Paramètre(s) enregistré en cookie',
   },
-  
+
   // @translator  Olga Kleinknecht <olga.klein0106@gmail.com>
   // @homepage    <http://spinachcandy.me/>
   // @language    Deutsch (de)
@@ -213,7 +213,7 @@ var l10n = {
     'bookmark_dont_click': 'Verschieben Sie mich in Lesezeichenmenü, hier nicht drücken :)',
     'downloaded_files':    'Heruntergeladene Dateien',
     'install_google_ext':  'Installieren Sie Google Chrome Extension',
-    
+
     'request_rpc_failed':     'Anfrage zu "rpc" fehlgeschlagen',
     'http_code':              'Code http',
     'get_tasks_list_error':   'Beim Senden der Aufgabenliste ist ein Fehler aufgetreten',
@@ -228,7 +228,7 @@ var l10n = {
     'addr_cannot_be_empty':      'Adresse kann nicht leer sein',
     'link_format_not_supported': 'Dieses Link-Format wird nicht akzeptiert',
     'use_this_format':           'nutzen Sie das folgende Format',
-    
+
     'From_task':      'Von der Aufgabe',
     'return_message': 'die Nachricht ist zurück',
     'bytes':          'Bytes',
@@ -237,18 +237,18 @@ var l10n = {
     'gb':             'GB',
     'tb':             'TB',
     'data_updated':   'Daten aktualisiert',
-    
+
     'download_not_added': 'Die Aufgabe ist nicht hinzugefügt',
     'server_error':       'Server fehlgeschlagen',
     'invalid_address':    'Falsche Adresse',
     'address':            'Adresse',
     'Address':            'Adresse',
     'not_valid':          'falsch',
-    
+
     'download_task_not_removed': 'Die Aufgabe wurde nicht entfernt',
     'open_dl_file_in_new_tab':   'Geladene Datei in neuem Tab öffnen',
     'task_completed_with_error': 'Das Herunterladen der Datei ist fehlgeschlagen',
-    
+
     'update_available':        'Das Update ist verfügbar',
     'current_version':         'Aktuelle Version',
     'available_version':       'Verfügbare Version',

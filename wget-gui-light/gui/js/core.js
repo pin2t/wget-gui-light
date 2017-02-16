@@ -1,5 +1,5 @@
 /*
-## @author    Samoylov Nikolay
+## @author    github.com/tarampampam
 ## @project   Wget GUI Light
 ## @copyright 2014 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
@@ -18,7 +18,7 @@ ONLINE PACKER: http://javascript-minifier.com/
 
 $(function() {
   "use strict";
-  
+
   /*
     Global document objects links
     -----------------------------
@@ -30,7 +30,7 @@ $(function() {
 
       $menu = $('#menu'),
       $menuButton = $('#menu-button'),
-      
+
       $taskList = $('#tasklist'),
       $downloadedFilesList = $('#downloadedFilesList'),
       $addTaskAddr = $('#addTaskAddr'),
@@ -61,7 +61,7 @@ $(function() {
   $menuButton.find('span').text(__('close', 'Сlose'));
   $('#bookmark').text(__('bookmark_download', 'Bookmark "Download"'));
   $downloadedFilesList.find('h2').text(__('downloaded_files', 'Downloaded files')+':');
-  
+
   /*
     Global variables
     ----------------
@@ -86,7 +86,7 @@ $(function() {
     var domain = $.url('domain', inputUrl),
       path = $.url('path', inputUrl),
       file = $.url('file', inputUrl),
-      
+
       labelText = '',
       labelText = (domain || domain.length !== 0) ? domain : labelText,
       labelText = (path || path.length !== 0) ? path : labelText,
@@ -106,7 +106,7 @@ $(function() {
       width: $(this).data("origWidth")
     }, 1200);
   });
-  
+
   // Fix Firefox auto-height bug
   if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
     $addTaskAddr.height(17);
@@ -116,7 +116,7 @@ $(function() {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
     return (results == null) ? null : (results[1] || 0) ;
   }
-  
+
   // Show notification function (ex.: showNoty({type: 'error', title: 'Title', msg: 'Message'}); )
   var showNoty = function(settings) {
         var Title    = (settings.hasOwnProperty('title')    && (typeof settings.title == 'string')) ? settings.title : '',
@@ -141,7 +141,7 @@ $(function() {
           window.alert(msgOut);
         }
       },
-      
+
       // Set window mode mode
       setMode = function(mode) {
         if((typeof mode !== 'string') || (mode == '')) return false;
@@ -186,7 +186,7 @@ $(function() {
         }
         return false;
       },
-      
+
       // Get Font-Awesome icon by file name
       getFAiconByFileName = function(filename) {
         if((typeof filename !== 'undefined') && (filename !== '')) {
@@ -204,7 +204,7 @@ $(function() {
         }
         return 'fa-file-o';
       },
-      
+
       // Convert bytes to human-like view
       bytesToSize = function(bytes) { // Source from: <http://stackoverflow.com/a/18650828/2252921>
         var sizes = [__('bytes', 'Bytes'), __('kb', 'KB'), __('mb', 'MB'), __('gb', 'GB'), __('tb', 'TB')];
@@ -212,7 +212,7 @@ $(function() {
         var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
         return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
       };
-  
+
   /*
     +---------------------------------------+----------------+
     | Get (send) data from (to) server side | Ajax functions |
@@ -247,7 +247,7 @@ $(function() {
           });
         return result;
       },
-  
+
       addWgetTask = function(inputData, callback) {
         $.getJSON(rpc, {'action': 'add_task', 'url': inputData.url, 'saveAs': inputData.saveAs})
           .done(function(JSON) {
@@ -276,7 +276,7 @@ $(function() {
             return false;
           });
       },
-  
+
       removeWgetTask = function(url_or_id, callback) {
         /* check - exists task or not */
         getWgetTasksList(function(tasks){
@@ -312,7 +312,7 @@ $(function() {
         });
         return false;
       },
-  
+
       getHistoryList = function(callback) {
         var historyList = [], result = [];
         $.getJSON(rpc, {'action': 'get_history'})
@@ -342,7 +342,7 @@ $(function() {
           });
         return result;
       },
-    
+
       getDownloadedFilesList = function(callback){
         $.getJSON(rpc, {'action': 'get_fileslist'})
           .done(function(JSON) {
@@ -365,7 +365,7 @@ $(function() {
           });
         return false;
       },
-  
+
       testServer = function() {
         $.getJSON(rpc, {'action': 'test'})
           .done(function(JSON) {
@@ -399,7 +399,7 @@ $(function() {
   var getTaskObj = function(taskID) {
         return $('.task.id'+taskID);
       },
-  
+
       // Set progress bar position
       setTaskProgress = function(taskID, setPosition) {
         if(typeof taskID !== 'number') return;
@@ -414,7 +414,7 @@ $(function() {
           .data('setWidth', setPosition).html('<b>'+setPosition+'</b><span></span>')
           .width(lastProgress+'%').animate({width: indicator.data('setWidth')+'%'}, 500);
       },
-  
+
       // Set task label text
       setTaskLabelText = function(taskID, labelText) {
         if(typeof taskID !== 'number') return;
@@ -423,7 +423,7 @@ $(function() {
           .text(labelText)
           .attr('title', labelText);
       },
-  
+
       // Add task to GUI
       addTaskGui = function(data) {
         /* data = {'url': 'http://foo.com/bar.dat', 'progress': 50, 'id': 12345, 'name': 'somename'} */
@@ -439,7 +439,7 @@ $(function() {
                  '<td class="actions"><input type="button" class="button cancel red-hover" value="'+__('cancel', 'Cancel')+'" /></td>'+
                  '</td></table>'+
                '</div>';
-               
+
         $taskList.append(html);
         var taskObj = $taskList.find('div.task.id'+taskID).last();
         taskObj
@@ -457,7 +457,7 @@ $(function() {
         setTaskProgress(taskID, data.progress);
         setMode('active_tasks');
       },
-  
+
       // Get tasks list (from GUI)
       getTasksList = function() {
         var tslist = $taskList.find('div.task');
@@ -470,8 +470,8 @@ $(function() {
         }
         return null;
       },
-      
-      
+
+
       // Remove (cancel) task
       removeTaskGui = function(taskID) {
         var taskObj = getTaskObj(taskID);
@@ -483,7 +483,7 @@ $(function() {
               setMode('bar_only');
           });
       },
-      
+
       addTask = function(fileUrl, progress) {
         // Add VK external video code support
         if(/\<iframe\s.*src=\"http.?\:\/\/.*vk\.com\/video_ext\.php\?.*\".*\>/i.test(fileUrl)) {
@@ -561,7 +561,7 @@ $(function() {
                   // or only show message
                   showNoty({
                     type: 'warning',
-                    title: __('From_task','From task')+' "'+result.url+'" '+__('return_message','return message'), 
+                    title: __('From_task','From task')+' "'+result.url+'" '+__('return_message','return message'),
                     msg: '<b>'+result.msg+'</b>',
                     timeout: 20000
                   });
@@ -572,7 +572,7 @@ $(function() {
                 if((result !== false) && (typeof result.url === 'string') && (typeof result.msg === 'string')) {
                   showNoty({
                     type: 'error',
-                    title: __('From_task','From task')+' "'+result.url+'" '+__('return_message','return message'), 
+                    title: __('From_task','From task')+' "'+result.url+'" '+__('return_message','return message'),
                     msg: '<b>'+result.msg+'</b>',
                     timeout: 20000
                   });
@@ -597,7 +597,7 @@ $(function() {
             msg: __('Address', 'Address')+' "<b>'+brokenUrls.join("</b>, <b>")+'</b>" '+__('not_valid', 'is not valid')
           });
       },
-      
+
       removeTask = function(taskID) {
         removeWgetTask(taskID, function(bool_result, msg){
           if(bool_result) {
@@ -613,7 +613,7 @@ $(function() {
           }
         });
       },
-      
+
       updateHistoryList = function(){
         getHistoryList(function(list){
           var historyDiv = $('#historyList');
@@ -642,7 +642,7 @@ $(function() {
           }
         });
       },
-  
+
       updateDownloadedFilesList = function(){
         var guiFilesList = $downloadedFilesList.find('ul'),
             tempFilesList = $('<ul />'); // create temp object
@@ -702,7 +702,7 @@ $(function() {
           }
         });
       },
-  
+
       syncTasksList = function() {
         /* Здесь всё таки нужен подробный комментарий. Функция для синхронизации данных полученных от сервера
            и тех, что отображены на GUI. Мы получаем список актуальных задач путем вызова 'getWgetTasksList',
@@ -768,18 +768,18 @@ $(function() {
           // Remove tasks from GUI
           for(var i = 0; i < RemovedTasksIDs.length; ++i) removeTaskGui(RemovedTasksIDs[i]);
           // Add tasks to GUI
-          for(var i = 0; i < AddedTasksIDs.length; ++i) 
-            for(var j = 0; j < Tasks.length; ++j) 
-              if(Tasks[j].id == AddedTasksIDs[i]) 
+          for(var i = 0; i < AddedTasksIDs.length; ++i)
+            for(var j = 0; j < Tasks.length; ++j)
+              if(Tasks[j].id == AddedTasksIDs[i])
                 addTaskGui({'url': Tasks[j].url, 'progress': Tasks[j].progress, 'id': Tasks[j].id, 'name': Tasks[j].saveAs});
           // Set active tasks count in title
           if(RemoteTasksIDs.length > 0)
             $pageTitle.text('('+RemoteTasksIDs.length+') '+titleText);
-          //if(DEBUG_MODE) console.info("Sync data:\n", 
-          //  'SyncedTasksIDs: '+SyncedTasksIDs+"\n", 
-          //  'RemoteTasksIDs: '+RemoteTasksIDs+"\n", 
-          //  'GuiTasksIDs: '+GuiTasksIDs+"\n", 
-          //  'RemovedTasksIDs: '+RemovedTasksIDs+"\n", 
+          //if(DEBUG_MODE) console.info("Sync data:\n",
+          //  'SyncedTasksIDs: '+SyncedTasksIDs+"\n",
+          //  'RemoteTasksIDs: '+RemoteTasksIDs+"\n",
+          //  'GuiTasksIDs: '+GuiTasksIDs+"\n",
+          //  'RemovedTasksIDs: '+RemovedTasksIDs+"\n",
           //  'AddedTasksIDs: '+AddedTasksIDs
           //);
           // Init history list
@@ -811,7 +811,7 @@ $(function() {
     };
     $(document).on('keydown', changeF5event);
   }
-  
+
   // Enable menu events
   var hideMenu = function(){
         $menu.removeClass('open').addClass('close');
@@ -825,7 +825,7 @@ $(function() {
     .on('click', function() {
       return ($menu.hasClass('open')) ? hideMenu() : openMenu();
     });
-  
+
   // on press 'enter' in url text input
   $addTaskAddr.on('keypress', function(e) {
     var taskFieldsLinesCount = $(this).val().split("\n").length;
@@ -867,21 +867,21 @@ $(function() {
   }).on('focus', function(){
     hideMenu(); // Hide side menu
   });
-  
+
   // on press 'add task' button
   $addTaskBtn.on('click', function(){
     addTask($addTaskAddr.val());
   });
-  
+
   // #taskExtended functions
   $addTaskAddr
     .on('focus',    function(){$('#taskExtended .multitask').animate({ opacity: 0.8 }, 200)})
     .on('focusout', function(){$('#taskExtended .multitask').animate({ opacity: 0 },   200)});
-  
+
   // Print version to any gui element with class 'projectCurrentVersion'
   if((typeof WGET_GUI_LIGHT_VERSION == 'string') && WGET_GUI_LIGHT_VERSION !== '')
     $('.projectCurrentVersion').text(' v'+WGET_GUI_LIGHT_VERSION);
-  
+
   // Enable feature 'Quick download bookmark'
   if(($.urlParam('action') == 'add')){
     $addTaskAddr.val($.urlParam('url')); $addTaskBtn.click();
@@ -912,7 +912,7 @@ $(function() {
             .attr('src', 'chrome-extension://dbcjcjjjijkgihaddcmppppjohbpcail/img/icon.png');
         },
         isBrowser = (/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())) ? 'chrome' : '';
-      
+
     if(isBrowser === 'chrome') {
       chromeCheckExtensionInstalled(function(installed){
         if(!installed) {
@@ -953,7 +953,7 @@ $(function() {
             if(versionCompare(WGET_GUI_LIGHT_VERSION, web_wgetguilight.version) < 0) {
               var webVer = web_wgetguilight;
               $menu.find('.bottom').last().append('<br /><a id="updateAvailable" href="'+webVer.download.page+'" title="'+webVer.lastUpdate.shortDesc+'" target="_blank">'+__('update_available', 'Update available')+'</a>');
-              var updateLink = $('#updateAvailable'), 
+              var updateLink = $('#updateAvailable'),
                 updateLinkOrigWidth = updateLink.width();
               // Animate showing notification link
               updateLink.css({width: 0}).animate({width: updateLinkOrigWidth}, 1000);
@@ -1018,7 +1018,7 @@ $(function() {
       } catch(e) {console.log('Error on checking update : ' + e)}// TODO: Comment while testing
     }
   }
-  
+
   /*
     +--------------------+
     | +----------------+ |
@@ -1034,11 +1034,11 @@ $(function() {
     setMode('disabled');
     return;
   }
-  
+
   //showNoty({type: 'error', title: 'Title', msg: 'Message'}); // For debug 'Noty'
   if(DEBUG_MODE) updateStatusInterval = 0; // For debug disable automatic data update
   //addTaskGui({'url': 'http://foo.com/bar.dat', 'progress': 23, 'id': 12345, 'name': 'Filename.ext'}); // For debug 'Gui Task'
-  
+
   setMode('bar_only'); // Set window mode and init favicon
   $addTaskAddr.focus(); // Set focus to input
   syncTasksList(); // Run timer // TODO: Uncomment

@@ -1,8 +1,8 @@
 /*
-## @author    Samoylov Nikolay
+## @author    github.com/tarampampam
 ## @project   Wget GUI Light
 ## @package   Google Chrome Extension
-## @copyright 2014 <samoylovnn@gmail.com>
+## @copyright 2014 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/wget-gui-light
 ## @version   Look in 'manifest.json'
@@ -11,10 +11,10 @@
 
 var globSettings = {pathToRpc: 'http://yourserver.ltd/wget-gui/rpc.php'},
     globMenuItemID = 'WgetGUILightHelper',
-    globUseGlobalStorage = true; // true = global, false = local 
+    globUseGlobalStorage = true; // true = global, false = local
         // TODO: Change to 'true' before release
 
-        
+
 /* -------------------------------------------------------------------------- */
 
 
@@ -38,7 +38,7 @@ function saveSettings(callback) {
     function saveInStorage(a,b){
         return(globUseGlobalStorage)?chrome.storage.sync.set(a,b):chrome.storage.local.set(a,b)
     }
-    
+
     saveInStorage({
         'pathToRpc': globSettings.pathToRpc
     }, function(result) {
@@ -52,17 +52,17 @@ function loadSetting(callback) {
     function loadFromStorage(a,b){
         return(globUseGlobalStorage)?chrome.storage.sync.get(a,b):chrome.storage.local.get(a,b)
     }
-    
+
     loadFromStorage(['pathToRpc'], function (value) {
         // If value not stored (loaded as 'undefined') - setup default (or setted in past) value
         setPathToRpc((typeof(value.pathToRpc) !== "undefined") ? value.pathToRpc : globSettings.pathToRpc);
-        
+
         //console.info('Settings loaded');
         if(typeof(callback) == "function") callback(true);
         return true;
     });
 }
- 
+
 
 /* -------------------------------------------------------------------------- */
 
@@ -93,10 +93,10 @@ function showNotify(text, caption) {
         return false;
     else if (Notification.permission === "granted") {
         chrome.notifications.create(notiId,
-            {   
-                type: 'basic', 
-                iconUrl: 'img/icon.png', 
-                title: notiCaption, 
+            {
+                type: 'basic',
+                iconUrl: 'img/icon.png',
+                title: notiCaption,
                 message: text
             }, function(){});
     }
@@ -107,10 +107,10 @@ function showNotify(text, caption) {
             }
             if (permission === "granted") {
                 chrome.notifications.create(notiId,
-                    {   
-                        type: 'basic', 
-                        iconUrl: 'img/icon.png', 
-                        title: notiCaption, 
+                    {
+                        type: 'basic',
+                        iconUrl: 'img/icon.png',
+                        title: notiCaption,
                         message: text
                     }, function(){});
             }
@@ -149,7 +149,7 @@ if(currVersion != prevVersion) {
     }
     localStorage['version'] = currVersion;
 }
-//localStorage['version'] = ''; // Reset state 
+//localStorage['version'] = ''; // Reset state
 
 
 /* -------------------------------------------------------------------------- */
@@ -165,7 +165,7 @@ loadSetting(function(){
             console.warn('ERROR: ' + chrome.runtime.lastError.message);
         }
     }*/);
-    
+
     chrome.contextMenus.onClicked.addListener(function(info, tab) {
         if (info.menuItemId === globMenuItemID) {
             var downloadURL = info.linkUrl || info.srcUrl;
